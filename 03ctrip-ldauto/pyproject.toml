@@ -1,0 +1,19 @@
+[project]
+name = "ctrip-ldauto"
+version = "0.1.0"
+description = "LDPlayer-based automation runner for Ctrip app tasks."
+requires-python = ">=3.11"
+dependencies = [
+  "PyYAML>=6.0.2",
+  "requests>=2.32.0",
+]
+
+[project.scripts]
+ctrip-ldauto = "ctrip_ldauto.__main__:main"
+
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

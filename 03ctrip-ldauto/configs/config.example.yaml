@@ -1,0 +1,39 @@
+system:
+  exit_wait_seconds: 20
+  startup_wait_seconds: 60
+  log_level: INFO
+  data_dir: data
+  app_mode: console
+
+ld:
+  ldplayer_path: "D:/leidian/LDPlayer9"
+  ldconsole_path: ""
+  adb_path: ""
+  instances:
+    - id: ld01
+      name: "雷电模拟器-1"
+      index: 0
+  packages:
+    ctrip: "ctrip.android.view"
+    pcapdroid: "com.emanuelef.remote_capture"
+  wait_device_ready_seconds: 90
+  wait_app_ready_seconds: 15
+
+task:
+  site_name: example
+  base_url: "https://example.com"
+  username: "account"
+  password: "password"
+  login_path: "/api/login"
+  city_path: "/api/cities"
+  task_path: "/api/tasks"
+  receive_task_path: "/api/tasks/receive"
+  upload_pcap_path: "/api/pcap/upload"
+  request_timeout_seconds: 20
+
+strategy:
+  batch_rest_seconds: 300
+  task_rest_seconds: 30
+  browse_seconds: 20
+  empty_task_retry_seconds: 60
+  max_task_retry: 3
