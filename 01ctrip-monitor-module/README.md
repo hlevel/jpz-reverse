@@ -2,7 +2,7 @@
 
 本工程是一个独立的 Java LSPosed 模块，用于在雷电模拟器中观察指定携程 APK 运行过程中的 Java 层数据。模块不解包、不修改、不重签名目标 APK。
 
-> 当前工程处于基础骨架阶段：已经具备 LSPosed 入口、目标进程过滤、Gson 监听和 OkHttp 请求方法/URL 监听；尚未针对目标 APK 的具体混淆类、业务方法、响应模型和 native 方法做定点 Hook。
+> 当前工程处于基础观察阶段：已经具备 LSPosed 入口、目标进程过滤、Gson 监听、OkHttp 请求方法/URL 监听、WebView URL/脚本入口监听，以及 Activity Intent/Bundle 和 SharedPreferences 写入监听；尚未针对目标 APK 的具体混淆类、业务方法、响应模型和 native 方法做定点 Hook。
 
 ## 项目背景
 
@@ -90,8 +90,8 @@ sequenceDiagram
 | 1 | Gson | JSON 输入、输出及 Java 模型 | 已加入基础 Hook |
 | 2 | OkHttp | 请求方法和 URL | 已加入基础 Hook |
 | 3 | 业务方法 | Request Bean、Response Bean、Repository 回调 | 等待 jadx 定位 |
-| 4 | WebView/JSBridge | H5 URL、桥接类和交互参数 | 待实现 |
-| 5 | Intent/本地存储 | 页面参数、配置和缓存 | 按需实现 |
+| 4 | WebView/JSBridge | H5 URL、桥接类和交互参数 | 已加入 WebView 基础 Hook；JSBridge 等待 jadx 定位 |
+| 5 | Intent/本地存储 | 页面参数、配置和缓存 | 已加入 Activity Intent/Bundle 与 SharedPreferences 写入 Hook |
 | 6 | JNI/native | Java/native 边界参数和返回值 | Java 层不足时再分析 |
 
 当前 OkHttp Hook 不主动读取 `ResponseBody.string()`，因为响应体通常只能消费一次。后续响应监听应优先 Hook 反序列化方法或业务回调；确需从 OkHttp 层观察时，应使用受大小限制的 `peekBody()` 或无副作用的拦截器。
@@ -152,7 +152,11 @@ app/src/main/java/com/jpz/ctripmonitor/CtripHook.java
 4. 尝试 Hook `com.google.gson.Gson.toJson()`。
 5. 尝试 Hook `com.google.gson.Gson.fromJson()`。
 6. 尝试 Hook `okhttp3.Request.Builder.build()`，记录 HTTP 方法和 URL。
-7. 对单条 Gson 日志进行长度截断，防止超长内容直接冲击 LSPosed 日志。
+7. 尝试 Hook `android.webkit.WebView.loadUrl()`、`postUrl()`、`loadDataWithBaseURL()` 和 `evaluateJavascript()`，记录 H5 URL 和脚本入口。
+8. 尝试 Hook `android.app.Activity.onCreate()` 和 `onNewIntent()`，记录页面类名、Intent URI 和 Bundle 参数。
+9. 尝试 Hook `SharedPreferencesImpl.EditorImpl` 的常见写入方法，记录配置和缓存键值变化。
+10. 对 HTTP、WebView 和 SharedPreferences 日志进行降噪：过滤静态资源、埋点 gif 和短时间重复项，只保留业务接口、H5 入口和定位类配置键。
+11. 对日志进行统一脱敏和长度截断，降低敏感信息与超长内容直接冲击 LSPosed 日志的风险。
 
 如果目标应用对 Gson 或 OkHttp 进行了重打包、混淆，基础 Hook 会记录 `unavailable`，此时需要使用 jadx 根据字符串、调用关系和类结构找出实际类名，再增加精确 Hook。
 
@@ -224,10 +228,11 @@ adb install -r app\build\outputs\apk\debug\app-debug.apk
 
 ## 已知限制
 
-- 工程尚未在当前机器完成 Gradle 构建，因为 Android SDK、Gradle 和 ADB 尚未配置。
+- 当前机器已使用 `D:\Program Files\.android\download` 内的离线包配置 Android SDK，并通过 `aapt2 + javac + d8 + apksigner` 手工生成 Debug APK。
 - SIT APK 的真实包名尚未通过其 Manifest 验证。
 - 当前没有读取 HTTP 请求体和响应体。
-- 当前没有实现 WebView、JSBridge、Intent、SharedPreferences、SQLite 或 JNI Hook。
+- 当前没有实现具体业务 JSBridge、SQLite 或 JNI Hook。
+- 标准 Gradle 构建仍受限于本机无法连接 `services.gradle.org` 下载 Gradle 7.6.4 分发包；`gradle/wrapper/gradle-wrapper.properties` 已把 `networkTimeout` 调整为 60000。
 - 目标版本升级后，混淆类名、方法签名和依赖版本可能变化，需要重新定位 Hook 点。
 - LSPosed 作用域配置错误、目标运行在未覆盖的子进程或类由其他 ClassLoader 加载，都会导致 Hook 不生效。
 
@@ -242,3 +247,14 @@ adb install -r app\build\outputs\apk\debug\app-debug.apk
 - 不将敏感账号、支付或个人信息原样持久化。
 
 如果将来需要临时验证 Hook 点，可以独立使用 Frida 做动态试验；确认类和方法后，再把稳定的只读监听逻辑迁移到本 LSPosed 模块中。
+## PCAP 离线解析命令
+
+当通过抓包方式拿到携程酒店业务流量后，可以使用 `02ctrip-pcap-reverse` 中的 Python 复刻脚本离线解析 SOTP 帧，并输出嵌入的 JSON 文档。
+
+示例命令：
+
+```powershell
+python 02ctrip-pcap-reverse\pcap_hotel_parser.py 02ctrip-pcap-reverse\work\ctrip_hotel_20260806_211621.pcap -o 02ctrip-pcap-reverse\work\ctrip_hotel_20260806_211621.json
+```
+
+脚本会按 TCP stream 重组 SOTP 数据，处理 XOR、GZIP、Zstd 压缩，再扫描 payload 中的 JSON 对象或数组。若遇到无法解压的单帧，会输出 warning 并跳过该帧，已成功解码的 JSON 会继续写入输出文件。

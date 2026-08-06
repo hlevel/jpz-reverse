@@ -6,3 +6,8 @@ build/
 dist/
 data/
 configs/config.yaml
+work/
+work/**/.venv/
+work/**/__pycache__/
+work/**/logs/*.log
+work/**/screenshots/*.png
