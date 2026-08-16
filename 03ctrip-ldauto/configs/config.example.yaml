@@ -34,7 +34,7 @@ xc:
     receive_task_path: "/api/tasks/receive"
     upload_pcap_path: "/api/pcap/upload"
     request_timeout_seconds: 20
-  strategy:
+  rule:
     - name: 普通
       batch_rest_seconds: 300
       task_rest_seconds: 30
