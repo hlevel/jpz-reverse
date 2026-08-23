@@ -6,20 +6,28 @@ system:
   app_mode: console
 
 ld:
-  ldplayer_path: "D:/leidian/LDPlayer9"
+  ldplayer_path: "D:/Program Files/leidian/LDPlayer14"
+  multiplayer_path: "D:/Program Files/leidian/ldmutiplayer/dnmultiplayerex.exe"
   ldconsole_path: ""
   adb_path: ""
   instances:
     - id: ld01
-      name: "雷电模拟器-1"
-      index: 0
+      name: "LDPlayer-2"
+      index: 2
+      launch_by: index
+      adb_serial: "emulator-5558"
     - id: ld02
-      name: "雷电模拟器-2"
-      index: 1
+      name: "LDPlayer-3"
+      index: 3
+      launch_by: index
+      adb_serial: "emulator-5560"
   wait_device_ready_seconds: 90
   wait_app_ready_seconds: 15
+  diagnostic_running_wait_seconds: 60
+  diagnostic_adb_wait_seconds: 15
+
 xc:
-  app: 
+  app:
     packages:
       ctrip: "ctrip.android.view"
       pcapdroid: "com.emanuelef.remote_capture"
@@ -35,23 +43,20 @@ xc:
     upload_pcap_path: "/api/pcap/upload"
     request_timeout_seconds: 20
   rule:
-    - name: 普通
+    - name: normal
       batch_rest_seconds: 300
       task_rest_seconds: 30
       browse_seconds: 20
       empty_task_retry_seconds: 60
       max_task_retry: 3
-      instance_ids: 
+      instance_ids:
         - ld01
         - ld02
-    - name: 白银
+    - name: silver
       batch_rest_seconds: 300
       task_rest_seconds: 30
       browse_seconds: 20
       empty_task_retry_seconds: 60
       max_task_retry: 3
-      instance_ids: 
+      instance_ids:
         - ld02
-
-
-

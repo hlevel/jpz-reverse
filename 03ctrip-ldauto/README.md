@@ -1,43 +1,95 @@
 # 03ctrip-ldauto
 
-基于 Python + venv 的雷电模拟器自动化工程。当前阶段先以设计文档驱动实现，`work/` 目录只作为临时参考资料和实验内容，不作为正式工程代码入口。
+Python automation runner for operating the Ctrip app through LDPlayer.
 
-## 文档入口
+`work/` is a temporary reference area. The formal v1 code lives in
+`src/ctrip_ldauto/`.
 
-- [系统设计文档](docs/design.md)
+## V1 scope
 
-## 约定
+V1 provides the runnable project backbone:
 
-- 正式代码后续放在 `src/ctrip_ldauto/`。
-- 配置文件后续放在 `configs/`。
-- 运行数据、cookie、任务、pcap、日志统一放在 `data/`。
-- `work/ldscript-automation` 仅参考其中雷电核心能力：`ldconsole.exe` 封装、ADB、应用包检测、点击、返回、输入、截图。
+- YAML config loading for `system`, `ld`, and `xc` modules.
+- Console + file logging under `data/logs/`.
+- LDPlayer lifecycle wrapper around `ldconsole.exe`.
+- ADB wrapper for app launch, package checks, tap/swipe/input/back/screenshot.
+- Task API client and local task state files.
+- One worker thread per emulator.
+- Replaceable business module boundary.
+- Initial Ctrip + PCAPdroid business flow placeholders.
 
+The concrete Ctrip page coordinates/templates are intentionally left for the
+next module implementation.
 
-## 故事
+## Setup
 
-[03ctrip-ldauto](03ctrip-ldauto/)  这个目录下面work是工作临时内容，当前目录是创建一项py工程，主要通过雷电模拟器操作携程app 进行自动化，
-一.流程:
-1.运行exe程序 然后运行一个命令窗口, 读取配置文件信息 配置文件信息包含4个模块，系统模块， ld模块，任务模块，策略模块
-2.通过ld模块获取到配置的那几个雷电模拟器名称，然后通过配置雷电多开器启动，如果已经启动则无需再次启动，启动失败则输出data/logs 日志到文件里面同时界面控制也需要输出, 停留20秒(这个是通过系统模块配置时长)后退出应用，正常则进入下一步骤
-3.启动配置的几个模拟器，等待启动完成，启动失败其中一个则报错，输出日志，同时界面控制也需要输出，如果配置的几个模拟器全部都失败，则停留20秒后退出应用，正常则进入下一步骤
-4.来到任务模块流程，通过任务模块，获取地址、账号、密码，通过http请求登录到网站，保存ck信息到 data/网站/ck_yyyyMMdd_模拟器id.txt，调用任务城市接口，再通过其中一个城市调用获取任务接口，获取到任务信息保存到 data/网站/task_yyyyMMdd_模拟器id.txt，如果没有任务则打印控制台停留20秒(这个是通过系统模块配置时长)后退出应用，关闭刚才启动模拟器.
-5.一个模拟器创建一条线程，通过ld模块获取是否安装了携程应用，PCAPdroid应用， 没则打印控制台输出日志，停留20秒退出应用，然后独立线程 获取data/网站/task_yyyyMMdd_模拟器id.txt 其中一条任务然后标记状态，如果没有任务则调用接口领取，再重复task.txt获取任务
-6.一个模拟器获取一条任务后 操作ld模块 打开PCAPdroid应用，打开携程app，进入酒店页面，选择 日期、输入酒店名称 点击搜索，出现列表，出现酒店列表，然后对比酒店名称，找到以后 然后切换应用PCAPdroid应用，点击开始，然后切回携程app，进入酒店详情，然后返回列表，继续查看该模拟器是否有下一条任务，如果有则进行在列表输入日期搜索，如果没有则切回PCAPdroid应用，点击停止，保存pcap文件(注意:需要预留点击搜索按钮后没有出现酒店的逻辑)
-7.获取保存的pcap文件 通过任务模块api上传到接口里，通过策略模块，读取每一批次任务休息多少秒，每一个任务休息多少秒，或者浏览一下帖子多少秒, 然后重复5模块
+```powershell
+cd 03ctrip-ldauto
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
 
-二.模块
-任务模块
-雷电模块
-携程业务模块
-系统调度模块
+## Config
 
-三.设计规则
-后续携程业务模块会换成其他业务模块
+Copy the example and edit local values:
 
-四.雷电模块 要求参考 03ctrip-ldauto\work\ldscript-automation 里面的实现，核心操作模块即可，不需要其他拖拉拽无用模块
+```powershell
+Copy-Item configs\config.example.yaml configs\config.yaml
+```
 
-五.技术
-1.先有设计文档
-2.通过venv管理
-3.md文件后续通过该文件进行一个模块一个模块进行实现
+Important sections:
+
+- `system`: runtime behavior, exit wait, log level, data directory.
+- `ld`: LDPlayer paths, multiplayer path, emulator instances, and diagnostics.
+- `xc.app`: Ctrip and PCAPdroid package names.
+- `xc.task`: task website API settings.
+- `xc.rule`: per-instance rest/browse/retry strategy.
+
+## Run
+
+Validate config:
+
+```powershell
+python -m ctrip_ldauto --check-config
+```
+
+Run automation:
+
+```powershell
+python -m ctrip_ldauto --config configs\config.yaml
+```
+
+Validate configured LDPlayer instances without starting them:
+
+```powershell
+python -m ctrip_ldauto --check-ld --no-start-ld
+```
+
+Run a real LDPlayer diagnostic that may start configured instances and then
+close the instances started by the diagnostic:
+
+```powershell
+python -m ctrip_ldauto --check-ld --ld-running-wait-seconds 20 --ld-adb-wait-seconds 15
+```
+
+When running from source without installing the package, set `PYTHONPATH` to
+`src` or use editable install:
+
+```powershell
+python -m pip install -e .
+python -m ctrip_ldauto --check-config
+```
+
+## Test
+
+Run the offline LDPlayer core tests. These tests mock `ldconsole.exe` and ADB,
+so they do not start a real emulator.
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+## Design doc
+
+See [docs/design.md](docs/design.md).

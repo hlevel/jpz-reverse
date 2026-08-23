@@ -1,66 +1,28 @@
-# 携程雷电模拟器自动化系统设计
+# 03ctrip-ldauto v1 design
 
-## 目标和边界
+This document is the implementation guide for `03ctrip-ldauto`. The current
+code follows the configuration shape in `configs/config.example.yaml`.
 
-本工程用于在 Windows 环境下通过雷电模拟器自动操作携程 App，完成酒店任务领取、App 搜索浏览、PCAPdroid 抓包、pcap 文件上传和按策略循环调度。
+## V1 objective
 
-当前阶段先完成可落地的工程设计，后续按本文档的模块清单逐个实现。
+V1 provides a runnable automation backbone for LDPlayer + Ctrip + PCAPdroid:
 
-正式工程不复用 `work/ldscript-automation` 的 Web 面板、拖拽脚本编辑器和通用流水线能力，只参考它的核心雷电控制实现：
+- Load and validate runtime config.
+- Write logs to console and `data/logs/`.
+- Start configured LDPlayer instances when needed.
+- Wait for ADB readiness.
+- Login to the task website and persist cookie/task files.
+- Run one worker thread per emulator.
+- Check Ctrip and PCAPdroid package installation.
+- Execute the business-module boundary for Ctrip tasks.
+- Save/pull/upload pcap files when PCAPdroid exposes one.
 
-- `auto_ld/emulator/ldplayer.py`：`ldconsole.exe` 启动、关闭、状态查询、实例列表、ADB serial 推导。
-- `auto_ld/controller/adb.py`：ADB 连接检查、截图、点击、滑动、返回、主页、文本输入、启动/停止 App、包名搜索。
-- `auto_ld/controller/packages.py`：应用包名记录思路。
+The concrete Ctrip page recognition and coordinate script is the next module
+to implement on top of the existing `BusinessModule` boundary.
 
-## 技术栈
+## Current config contract
 
-| 项目 | 选择 |
-| --- | --- |
-| 语言 | Python 3.11+ |
-| 环境管理 | venv |
-| 配置格式 | YAML |
-| HTTP 客户端 | requests 或 httpx |
-| 并发模型 | 每个模拟器一个线程，主线程负责调度和退出控制 |
-| 日志 | logging，控制台和 `data/logs/` 双输出 |
-| 打包 | PyInstaller 生成 exe |
-| UI | 第一阶段使用命令窗口控制台输出；后续可接入轻量控制界面 |
-
-## 目录规划
-
-```text
-03ctrip-ldauto/
-  README.md
-  docs/
-    design.md
-  pyproject.toml
-  requirements.txt
-  configs/
-    config.example.yaml
-  data/
-    logs/
-    pcap/
-    <site>/
-      ck_yyyyMMdd_<emulator_id>.txt
-      task_yyyyMMdd_<emulator_id>.txt
-  src/
-    ctrip_ldauto/
-      __main__.py
-      app.py
-      config/
-      logging/
-      ld/
-      task/
-      business/
-      scheduler/
-      storage/
-      strategy/
-```
-
-`work/` 是工作临时目录，不参与正式包结构。
-
-## 配置文件设计
-
-配置文件包含四个一级模块：系统模块、雷电模块、任务模块、策略模块。
+The current config has three top-level sections:
 
 ```yaml
 system:
@@ -71,324 +33,320 @@ system:
   app_mode: console
 
 ld:
-  ldplayer_path: "D:/leidian/LDPlayer9"
+  ldplayer_path: "D:/Program Files/leidian/LDPlayer14"
+  multiplayer_path: "D:/Program Files/leidian/ldmutiplayer/dnmultiplayerex.exe"
   ldconsole_path: ""
   adb_path: ""
   instances:
     - id: ld01
-      name: "雷电模拟器-1"
-      index: 0
-    - id: ld02
-      name: "雷电模拟器-2"
-      index: 1
-  packages:
-    ctrip: "ctrip.android.view"
-    pcapdroid: "com.emanuelef.remote_capture"
+      name: "LDPlayer-2"
+      index: 2
+      launch_by: index
+      adb_serial: "emulator-5558"
   wait_device_ready_seconds: 90
   wait_app_ready_seconds: 15
+  diagnostic_running_wait_seconds: 60
+  diagnostic_adb_wait_seconds: 15
 
-task:
-  site_name: example
-  base_url: "https://example.com"
-  username: "account"
-  password: "password"
-  login_path: "/api/login"
-  city_path: "/api/cities"
-  task_path: "/api/tasks"
-  receive_task_path: "/api/tasks/receive"
-  upload_pcap_path: "/api/pcap/upload"
-  request_timeout_seconds: 20
-
-strategy:
-  batch_rest_seconds: 300
-  task_rest_seconds: 30
-  browse_seconds: 20
-  empty_task_retry_seconds: 60
-  max_task_retry: 3
+xc:
+  app:
+    packages:
+      ctrip: "ctrip.android.view"
+      pcapdroid: "com.emanuelef.remote_capture"
+  task:
+    site_name: example
+    base_url: "https://example.com"
+    username: "account"
+    password: "password"
+    login_path: "/api/login"
+    city_path: "/api/cities"
+    task_path: "/api/tasks"
+    receive_task_path: "/api/tasks/receive"
+    upload_pcap_path: "/api/pcap/upload"
+    request_timeout_seconds: 20
+  rule:
+    - name: normal
+      batch_rest_seconds: 300
+      task_rest_seconds: 30
+      browse_seconds: 20
+      empty_task_retry_seconds: 60
+      max_task_retry: 3
+      instance_ids:
+        - ld01
 ```
 
-敏感配置后续可以支持 `.env` 覆盖，例如账号、密码、接口地址。
+## Config section responsibilities
 
-## 总体流程
+| Section | Purpose | Implemented by |
+| --- | --- | --- |
+| `system` | Process behavior, data directory, logs, exit wait | `config.models.SystemConfig`, `log.setup` |
+| `ld` | LDPlayer path, multiplayer path, ADB path, emulator instances | `ld.ldconsole`, `ld.manager`, `ld.adb` |
+| `xc.app` | Business app package names | `business.ctrip`, `business.pcapdroid` |
+| `xc.task` | Task website endpoints and credentials | `task.client`, `task.service` |
+| `xc.rule` | Per-instance strategy values | `strategy.selector`, `scheduler.runner` |
+
+`configs/config.yaml` is the local runtime file. If it does not exist, the
+loader falls back to `configs/config.example.yaml`.
+
+Environment overrides:
+
+| Environment variable | Replaces |
+| --- | --- |
+| `CTRIP_LDAUTO_BASE_URL` | `xc.task.base_url` |
+| `CTRIP_LDAUTO_USERNAME` | `xc.task.username` |
+| `CTRIP_LDAUTO_PASSWORD` | `xc.task.password` |
+
+## Runtime flow
 
 ```mermaid
 flowchart TD
-  A[启动 exe] --> B[读取配置]
-  B --> C[初始化日志和控制台输出]
-  C --> D[按 ld 配置定位雷电多开器]
-  D --> E{ldconsole 可用?}
-  E -- 否 --> Z[记录日志并等待 exit_wait_seconds 后退出]
-  E -- 是 --> F[启动配置的模拟器]
-  F --> G{至少一个模拟器启动成功?}
-  G -- 否 --> Z
-  G -- 是 --> H[登录任务网站并保存 ck]
-  H --> I[拉取城市和任务并保存 task 文件]
-  I --> J{存在任务?}
-  J -- 否 --> K[关闭已启动模拟器并等待后退出]
-  J -- 是 --> L[每个模拟器创建独立工作线程]
-  L --> M[线程循环领取任务并执行业务]
-  M --> N[PCAPdroid 抓包和携程酒店浏览]
-  N --> O[上传 pcap]
-  O --> P[按策略休息]
-  P --> M
+  A[CLI start] --> B[Load config]
+  B --> C[Setup logging]
+  C --> D{--check-config?}
+  D -- yes --> E[Exit after validation]
+  D -- no --> F[Create task service]
+  F --> G[Init LDPlayer manager]
+  G --> H[Start configured emulators]
+  H --> I{Any emulator ready?}
+  I -- no --> Z[Log, wait exit_wait_seconds, exit]
+  I -- yes --> J[Login and fetch tasks per emulator]
+  J --> K{Any task?}
+  K -- no --> L[Close emulators started by this process, wait, exit]
+  K -- yes --> M[Create one worker thread per emulator]
+  M --> N[Verify Ctrip and PCAPdroid packages]
+  N --> O[Claim local task or receive from API]
+  O --> P[Run Ctrip business module]
+  P --> Q[Pull pcap if available]
+  Q --> R[Upload pcap]
+  R --> S[Apply rule rest time]
+  S --> O
 ```
 
-## 模块职责
+## Module layout
 
-### 系统调度模块
+```text
+src/ctrip_ldauto/
+  __main__.py              CLI entry
+  app.py                   application orchestration
+  config/
+    loader.py              YAML loading and validation
+    models.py              dataclass config models
+  log/
+    setup.py               console + file logging
+  ld/
+    ldconsole.py           ldconsole.exe wrapper
+    adb.py                 ADB wrapper
+    device.py              emulator device model
+    manager.py             start/close configured emulators
+  task/
+    client.py              HTTP task API client
+    storage.py             cookie/task local state files
+    service.py             task workflow facade
+  strategy/
+    selector.py            rule selection by instance id
+  business/
+    base.py                replaceable business interface
+    ctrip.py               Ctrip business module
+    pcapdroid.py           PCAPdroid capture helper
+  scheduler/
+    runner.py              per-emulator worker threads
+```
 
-负责进程生命周期、配置加载、日志初始化、启动失败退出等待、线程创建、线程回收和全局停止信号。
+## Data files
 
-关键职责：
+Runtime data is written under `system.data_dir`.
 
-- 运行 exe 后启动命令窗口输出。
-- 读取 YAML 配置并校验四个一级模块。
-- 将日志同时输出到控制台和 `data/logs/ldauto_yyyyMMdd.log`。
-- 统一执行 `exit_wait_seconds` 后退出。
-- 启动成功的模拟器需要在无任务或异常退出时按策略关闭。
-- 捕获 Ctrl+C，通知所有模拟器线程停止，停止 PCAPdroid 抓包并关闭模拟器。
+```text
+data/
+  logs/
+    ldauto_yyyyMMdd.log
+  pcap/
+    yyyyMMdd/
+      <emulator_id>/
+        <pcap-file>
+  <site_name>/
+    ck_yyyyMMdd_<emulator_id>.txt
+    task_yyyyMMdd_<emulator_id>.txt
+```
 
-### 雷电模块
+Task files use JSON Lines with this shape:
 
-负责雷电模拟器和 ADB 的核心控制。实现时参考 `work/ldscript-automation`，只保留核心操作。
+```json
+{
+  "_local_id": "task-id",
+  "status": "new",
+  "retry": 0,
+  "task": {
+    "hotel_name": "example hotel"
+  }
+}
+```
 
-关键能力：
+Supported statuses:
 
-- 定位 `ldconsole.exe` 和 `adb.exe`。
-- 读取配置中的模拟器名称或 index。
-- 查询实例是否存在。
-- 查询实例是否已运行，已运行则跳过启动。
-- 启动实例并等待 ADB ready。
-- 关闭实例。
-- 获取实例 serial。
-- 检查应用是否安装。
-- 启动/停止 App。
-- 点击、滑动、返回、主页、输入文本、截图。
-- 等待界面条件：通过截图模板、OCR 或坐标状态判断。
-
-雷电启动规则：
-
-1. 先校验 `ldconsole.exe` 可执行。
-2. 对配置的每个实例查询运行状态。
-3. 已运行实例标记为 `already_running`，不重复启动。
-4. 未运行实例调用 `ldconsole launch --index <index>`。
-5. 等待 `ldconsole isrunning` 和 ADB `shell echo ok` 同时可用。
-6. 单个实例失败时记录错误；所有实例失败时等待后退出。
-
-### 任务模块
-
-负责网站登录、cookie 保存、城市接口、任务接口、任务领取、任务文件读写、任务状态标记和 pcap 上传。
-
-数据文件：
-
-| 文件 | 内容 |
+| Status | Meaning |
 | --- | --- |
-| `data/<site>/ck_yyyyMMdd_<emulator_id>.txt` | 当前登录 cookie 或 token |
-| `data/<site>/task_yyyyMMdd_<emulator_id>.txt` | 当前模拟器任务队列和任务状态 |
+| `new` | Stored locally and not yet claimed |
+| `claimed` | Claimed by one emulator worker |
+| `running` | Business module is executing |
+| `pcap_saved` | PCAP file was pulled locally |
+| `uploaded` | PCAP upload succeeded |
+| `pcap_missing` | Business flow finished but no PCAP file was found |
+| `failed` | Execution or upload failed |
 
-任务状态建议：
+## LDPlayer module behavior
 
-| 状态 | 含义 |
-| --- | --- |
-| `new` | 已拉取未执行 |
-| `claimed` | 已被某模拟器线程领取 |
-| `running` | 正在执行 |
-| `pcap_saved` | 已保存 pcap |
-| `uploaded` | 已上传 |
-| `failed` | 执行失败 |
-| `no_hotel` | 搜索后没有酒店或未匹配到酒店 |
+`ld.manager.EmulatorManager` owns LDPlayer lifecycle:
 
-任务领取规则：
+1. Resolve `ldconsole.exe` from `ld.ldconsole_path`, then `ld.ldplayer_path`,
+   then `ld.multiplayer_path` by reading `pathconfig.ini`, then common
+   LDPlayer install paths.
+2. Resolve `adb.exe` from `ld.adb_path`, then LDPlayer directory.
+3. For each configured instance, call `isrunning`.
+4. Already-running instances are reused and not closed by this process.
+5. Stopped instances are launched with `ldconsole launch --index <index>` or
+   `ldconsole launch --name <name>`, based on `ld.instances[].launch_by`.
+6. ADB serial is read from `ld.instances[].adb_serial` when configured,
+   otherwise through `ldconsole adb --command get-serialno`, with
+   `emulator-{5554 + index * 2}` as fallback.
+7. ADB readiness is checked with `adb shell echo ok`.
 
-1. 线程先从本地 `task_yyyyMMdd_<emulator_id>.txt` 读取一条 `new` 任务。
-2. 读取成功后原子标记为 `claimed`，避免同一线程重复处理。
-3. 本地无任务时调用领取接口。
-4. 领取接口返回任务后写入本地文件，再重复本地读取逻辑。
-5. 接口无任务时按 `strategy.empty_task_retry_seconds` 等待后重试。
+Instance fields:
 
-### 携程业务模块
+| Field | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | Stable logical id used by task files and rules |
+| `index` | yes | LDPlayer instance index from `ldconsole list2` |
+| `name` | yes | Human-readable label; exact LDPlayer name only matters when `launch_by=name` |
+| `launch_by` | no | `index` by default; use `name` only when the real instance name is stable |
+| `adb_serial` | no | Explicit ADB serial override for nonstandard LDPlayer ports |
 
-负责具体 App 操作流程。后续该模块会替换成其他业务模块，因此必须通过统一接口接入系统调度。
+## LDPlayer diagnostics
 
-建议接口：
+Use `--check-ld` to validate every configured `ld.instances` item against the
+real multiplayer instance list.
+
+```powershell
+python -m ctrip_ldauto --check-ld
+```
+
+Useful diagnostic variants:
+
+```powershell
+python -m ctrip_ldauto --check-ld --no-start-ld
+python -m ctrip_ldauto --check-ld --ld-running-wait-seconds 20 --ld-adb-wait-seconds 15
+python -m ctrip_ldauto --check-ld --keep-started-ld
+```
+
+The diagnostic reports:
+
+- whether the configured index exists in `ldconsole list2`;
+- whether the instance was already running;
+- whether launch entered a stable running state;
+- which ADB serial was selected;
+- whether ADB became ready;
+- whether Ctrip and PCAPdroid packages are installed;
+- suggested config changes such as `launch_by=index` or `adb_serial`.
+
+## Task API behavior
+
+`task.client.TaskApiClient` uses these endpoint conventions:
+
+| Operation | Method | Config path | Request shape |
+| --- | --- | --- | --- |
+| Login | `POST` | `xc.task.login_path` | `{"username": "...", "password": "..."}` |
+| Cities | `GET` | `xc.task.city_path` | no body |
+| Tasks | `GET` | `xc.task.task_path` | optional `city_id` query |
+| Receive | `POST` | `xc.task.receive_task_path` | `{"emulator_id": "ld01"}` |
+| Upload pcap | `POST multipart` | `xc.task.upload_pcap_path` | `task_id`, `emulator_id`, `file` |
+
+The response parser accepts common list envelopes such as `tasks`, `cities`,
+`data`, or `items`.
+
+## Business module boundary
+
+Business modules implement:
 
 ```python
 class BusinessModule:
     name: str
 
     def verify_environment(self, device) -> None:
-        """检查目标业务 App 和辅助 App 是否安装。"""
+        ...
 
-    def run_task(self, device, task, capture) -> dict:
-        """执行一条业务任务，返回执行结果和 pcap 路径。"""
+    def run_task(self, device, task_record, rule) -> BusinessResult:
+        ...
 ```
 
-携程当前业务流程：
+This boundary allows the current Ctrip module to be replaced later without
+changing LDPlayer, task, strategy, or scheduler code.
 
-1. 检查携程 App 和 PCAPdroid 是否安装。
-2. 打开 PCAPdroid。
-3. 打开携程 App。
-4. 进入酒店页面。
-5. 选择入住日期和离店日期。
-6. 输入酒店名称。
-7. 点击搜索。
-8. 等待酒店列表出现。
-9. 对比酒店名称。
-10. 找到目标酒店后切换到 PCAPdroid，点击开始抓包。
-11. 切回携程 App，进入酒店详情。
-12. 浏览 `strategy.browse_seconds`。
-13. 返回酒店列表。
-14. 如果该模拟器还有下一条任务，继续在列表页改日期和酒店名搜索。
-15. 如果没有下一条任务，切回 PCAPdroid，点击停止并保存 pcap。
-16. 返回 pcap 路径给任务模块上传。
+Current Ctrip v1 behavior:
 
-必须预留的异常分支：
+1. Verify Ctrip package exists.
+2. Verify PCAPdroid package exists.
+3. Open PCAPdroid.
+4. Open Ctrip.
+5. Enter the Ctrip hotel automation boundary.
+6. Sleep for `rule.browse_seconds`.
+7. Return/back once.
+8. Open PCAPdroid and search for the latest `.pcap` or `.pcapng` file under
+   common SD card directories.
+9. Pull the file to `data/pcap/yyyyMMdd/<emulator_id>/`.
+10. Let the task module upload it.
 
-- 搜索按钮点击后列表未出现。
-- 搜索结果为空。
-- 列表出现但酒店名称不匹配。
-- App 弹窗遮挡。
-- PCAPdroid 开始或停止按钮未点击成功。
-- pcap 文件未生成。
-- App 崩溃或 ADB 断开。
+The next business implementation should fill the Ctrip page actions:
 
-### 策略模块
+- Enter hotel page.
+- Select check-in/check-out date.
+- Input hotel name.
+- Click search.
+- Wait for hotel list.
+- Match hotel name.
+- Handle empty result or no matched hotel.
+- Enter detail page.
+- Return to list for the next task.
 
-负责节奏控制和休息时间，不直接操作模拟器。
+## Command line
 
-策略字段：
+Validate config:
 
-- 每一批次任务休息多少秒：`batch_rest_seconds`
-- 每一个任务休息多少秒：`task_rest_seconds`
-- 浏览酒店详情多少秒：`browse_seconds`
-- 空任务重试间隔：`empty_task_retry_seconds`
-- 单任务最大重试：`max_task_retry`
-
-策略模块只返回决策结果，例如 `sleep_seconds`、`should_retry`、`should_stop_batch`。
-
-## 线程模型
-
-```mermaid
-flowchart LR
-  Main[主线程] --> Cfg[配置和日志]
-  Main --> Login[登录和初始化任务]
-  Main --> T1[模拟器线程 ld01]
-  Main --> T2[模拟器线程 ld02]
-  Main --> Tn[模拟器线程 ldN]
-  T1 --> Q1[本地任务文件]
-  T2 --> Q2[本地任务文件]
-  Tn --> Qn[本地任务文件]
-  T1 --> API[任务接口和上传接口]
-  T2 --> API
-  Tn --> API
+```powershell
+python -m ctrip_ldauto --check-config
 ```
 
-每个模拟器线程只操作自己的模拟器和自己的任务文件，减少锁竞争。共享的只有全局停止信号、日志和任务接口。
+Validate LDPlayer instances:
 
-## PCAP 文件处理
-
-PCAPdroid 保存文件后，雷电模块通过 ADB 查找最新文件并 pull 到本地：
-
-```text
-data/pcap/yyyyMMdd/<emulator_id>/<task_id>.pcap
+```powershell
+python -m ctrip_ldauto --check-ld --no-start-ld
+python -m ctrip_ldauto --check-ld --ld-running-wait-seconds 20 --ld-adb-wait-seconds 15
 ```
 
-上传成功后，任务状态更新为 `uploaded`。上传失败时保留本地 pcap，任务状态更新为 `pcap_saved` 或 `failed`，后续可以实现补传命令。
+Run with a local config:
 
-## 日志规范
-
-日志同时输出到控制台和文件：
-
-```text
-data/logs/ldauto_yyyyMMdd.log
+```powershell
+python -m ctrip_ldauto --config configs\config.yaml
 ```
 
-建议格式：
+When running without package installation:
 
-```text
-2026-08-06 22:30:00 INFO [main] 读取配置完成
-2026-08-06 22:30:01 INFO [ld01] 模拟器已运行，跳过启动
-2026-08-06 22:30:10 ERROR [ld02] ADB 连接失败: timeout
+```powershell
+python -c "import sys; sys.path.insert(0, r'src'); from ctrip_ldauto.__main__ import main; raise SystemExit(main(['--check-config']))"
 ```
 
-## 第一阶段实现清单
+## Implementation checkpoints
 
-### 1. 工程基础
+V1 code follows this document:
 
-- 创建 `pyproject.toml`。
-- 创建 `requirements.txt`。
-- 创建 venv 使用说明。
-- 创建 `src/ctrip_ldauto/__main__.py`。
-- 创建配置示例 `configs/config.example.yaml`。
-- 创建日志模块。
+- `config.loader` parses the new `xc` shape.
+- `strategy.selector` chooses a rule from `xc.rule` by `instance_ids`.
+- `business.ctrip` reads packages from `xc.app.packages`.
+- `task.client` reads endpoints from `xc.task`.
+- `scheduler.runner` runs one worker per started emulator.
 
-### 2. 配置模块
+Before extending the Ctrip page logic, run:
 
-- 定义 `SystemConfig`、`LdConfig`、`TaskConfig`、`StrategyConfig`。
-- YAML 加载。
-- 必填字段校验。
-- 默认值处理。
-- 敏感字段环境变量覆盖。
-
-### 3. 雷电模块
-
-- 封装 `LDConsoleClient`。
-- 封装 `AdbDevice`。
-- 实现实例列表、状态查询、启动、关闭。
-- 实现 ADB ready 检查。
-- 实现 App 安装检查。
-- 实现基础点击、滑动、返回、输入、截图。
-
-### 4. 任务模块
-
-- 登录接口。
-- cookie/token 保存。
-- 城市接口。
-- 任务接口。
-- 领取任务接口。
-- 本地任务文件读写和状态标记。
-- pcap 上传接口。
-
-### 5. 携程业务模块
-
-- 业务模块接口。
-- 携程业务实现。
-- 酒店首页进入。
-- 日期选择。
-- 酒店名称输入。
-- 搜索和列表等待。
-- 酒店名称匹配。
-- 详情页浏览。
-- 无酒店和异常分支。
-
-### 6. PCAPdroid 模块
-
-- 打开 PCAPdroid。
-- 开始抓包。
-- 停止抓包。
-- 查找并导出最新 pcap。
-- 与任务上传流程串联。
-
-### 7. 系统调度模块
-
-- 主流程编排。
-- 每个模拟器一个线程。
-- 全部失败退出。
-- 无任务退出并关闭已启动模拟器。
-- Ctrl+C 优雅停止。
-- 策略休眠。
-
-### 8. 打包
-
-- PyInstaller 配置。
-- exe 启动入口。
-- 配置文件和 data 目录路径兼容。
-
-## 后续实现原则
-
-- 先实现可观测的最小闭环，再补复杂识别能力。
-- 每个模块必须有清晰输入、输出和错误类型。
-- 携程业务模块不能直接读取全局配置，只接收调度器传入的设备、任务和策略。
-- 业务模块替换时，系统调度、雷电模块、任务模块不改或少改。
-- 所有失败都必须同时写控制台和 `data/logs/`。
-- 涉及任务状态变化时，先写本地状态，再调用外部接口。
+```powershell
+python -m compileall src
+python -m ctrip_ldauto --check-config
+```
