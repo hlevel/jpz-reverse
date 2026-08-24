@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生产运行数据分析与归档管理软件升级改造服务 投标文件（技术部分·细化版）</title>
+<style>
+  :root{
+    --blue:#143c6b; --blue2:#1a4d8f; --blue3:#2f6fb0; --blue4:#5aa0d4;
+    --red:#c8102e; --red2:#e23b3b;
+    --ink:#1f2733; --gray:#5b6675; --line:#d8dee8;
+    --bg:#eef2f7; --card:#ffffff; --soft:#f5f8fc;
+    --ok:#2e9e5b; --warn:#e8a33d; --bad:#c8102e;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;font-size:14.5px;line-height:1.72;}
+  a{color:var(--blue2);text-decoration:none;}
+
+  /* 目录侧栏 */
+  #toc{position:fixed;top:0;left:0;width:262px;height:100vh;overflow-y:auto;z-index:50;
+    background:linear-gradient(180deg,#0f2e54,#143c6b 60%,#1a4d8f);color:#dce6f2;padding:20px 14px;font-size:12.5px;}
+  #toc .logo{font-size:15px;font-weight:700;color:#fff;letter-spacing:1px;}
+  #toc .sub{font-size:11px;color:#9fb6d4;margin:4px 0 14px;line-height:1.5;}
+  #toc .grp{color:#7fa3cf;font-size:11px;margin:12px 0 4px;letter-spacing:1px;}
+  #toc a{display:block;color:#cdddf0;padding:3px 9px;border-radius:6px;line-height:1.35;}
+  #toc a:hover{background:rgba(255,255,255,.12);color:#fff;}
+  #toc a .n{display:inline-block;width:22px;color:#7fd0ff;font-weight:700;}
+
+  #main{margin-left:262px;padding:0;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 44px 90px;}
+
+  /* 封面 */
+  .cover{height:100vh;min-height:600px;display:flex;flex-direction:column;justify-content:center;align-items:center;
+    text-align:center;color:#fff;position:relative;overflow:hidden;
+    background:radial-gradient(1200px 500px at 70% -10%,rgba(47,111,176,.55),transparent 60%),
+      linear-gradient(135deg,#0f2e54 0%,#143c6b 45%,#1a4d8f 100%);}
+  .cover:before{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border:60px solid rgba(255,255,255,.05);border-radius:50%;}
+  .cover:after{content:"";position:absolute;left:-100px;bottom:-100px;width:340px;height:340px;border:48px solid rgba(200,16,46,.18);border-radius:50%;}
+  .cover .tag{border:1px solid rgba(255,255,255,.4);padding:6px 18px;border-radius:30px;font-size:13px;letter-spacing:3px;margin-bottom:24px;color:#cfe0f4;}
+  .cover h1{font-size:38px;margin:0 0 12px;font-weight:800;letter-spacing:2px;text-shadow:0 2px 18px rgba(0,0,0,.3);}
+  .cover h2{font-size:20px;margin:0 0 28px;font-weight:500;color:#dbe7f6;}
+  .cover .meta{font-size:14.5px;color:#bcd0ea;line-height:2;}
+  .cover .org{margin-top:34px;font-size:16px;color:#fff;font-weight:600;}
+  .cover .redbar{width:90px;height:5px;background:var(--red);margin:20px auto 0;border-radius:3px;}
+
+  .chapter{padding-top:50px;}
+  .ch-head{display:flex;align-items:baseline;gap:14px;border-bottom:3px solid var(--blue2);padding-bottom:10px;margin-bottom:6px;}
+  .ch-head .no{font-size:32px;font-weight:800;color:var(--blue2);line-height:1;flex:none;}
+  .ch-head h2{font-size:23px;margin:0;color:var(--blue);font-weight:800;}
+  .sec{padding:16px 0 4px;}
+  .sec h3{font-size:18px;color:var(--blue2);margin:16px 0 9px;font-weight:700;border-left:5px solid var(--red);padding-left:12px;}
+  .sec h4{font-size:15.5px;color:var(--ink);margin:14px 0 7px;font-weight:700;}
+  p{margin:7px 0;}
+  .muted{color:var(--gray);}
+
+  .grid{display:grid;gap:14px;margin:12px 0;}
+  .g2{grid-template-columns:repeat(2,1fr);}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px 16px;box-shadow:0 2px 9px rgba(20,60,107,.05);}
+  .card .k{font-size:12.5px;color:var(--gray);}
+  .card .v{font-size:21px;font-weight:800;color:var(--blue2);margin:2px 0;}
+  .card .v small{font-size:12px;color:var(--gray);font-weight:500;}
+  .card .d{font-size:12px;color:var(--gray);line-height:1.5;}
+  .card h4{margin-top:0;color:var(--blue2);}
+
+  table{width:100%;border-collapse:collapse;margin:11px 0;background:#fff;font-size:13px;}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  thead th{background:var(--blue2);color:#fff;font-weight:600;border-color:var(--blue2);}
+  tbody tr:nth-child(even){background:var(--soft);}
+  tbody tr:hover{background:#eaf1fb;}
+  .num{text-align:center;width:40px;}
+  .center{text-align:center;}
+
+  .kv{display:grid;grid-template-columns:150px 1fr;gap:0 14px;margin:8px 0;}
+  .kv dt{color:var(--gray);font-weight:600;padding:3px 0;}
+  .kv dd{margin:0;padding:3px 0;}
+
+  .tip{background:#fff7e8;border:1px solid #f0d39a;border-left:4px solid var(--warn);border-radius:8px;padding:9px 13px;margin:11px 0;font-size:13px;color:#7a5a16;}
+  .note{color:var(--red);font-weight:600;}
+  ul.clean{margin:7px 0;padding-left:19px;}
+  ul.clean li{margin:4px 0;}
+
+  .fig{background:#fff;border:1px solid var(--line);border-radius:11px;padding:16px;margin:14px 0;box-shadow:0 2px 9px rgba(20,60,107,.05);}
+  .fig .cap{font-size:12px;color:var(--gray);text-align:center;margin-top:9px;}
+
+  /* 组织流 */
+  .org-flow{display:flex;flex-direction:column;align-items:center;gap:0;}
+  .box{background:var(--blue2);color:#fff;border-radius:9px;padding:9px 16px;font-weight:600;text-align:center;min-width:160px;box-shadow:0 3px 9px rgba(20,60,107,.18);}
+  .box.lead{background:var(--red);}
+  .box.sub{background:var(--blue3);}
+  .box.leaf{background:#eaf1fb;color:var(--blue);border:1px solid #bcd2ee;font-weight:600;min-width:140px;}
+  .arrow-v{width:2px;height:20px;background:var(--line);}
+  .org-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+
+  /* 分层 */
+  .layers{display:flex;flex-direction:column;gap:7px;}
+  .layer{border-radius:9px;padding:9px 13px;color:#fff;display:flex;align-items:center;gap:12px;}
+  .layer .lab{font-weight:700;min-width:135px;}
+  .layer .items{font-size:12px;opacity:.96;line-height:1.4;}
+  .l1{background:#0f2e54;} .l2{background:#1a4d8f;} .l3{background:#2f6fb0;}
+  .l4{background:#3f86c4;} .l5{background:#5aa0d4;} .l6{background:#7bb6e0;color:#0f2e54;}
+  .cross{display:flex;gap:9px;margin-top:9px;flex-wrap:wrap;}
+  .cross .c{background:#fdecef;color:var(--red);border:1px dashed var(--red);border-radius:7px;padding:5px 11px;font-size:12px;font-weight:600;}
+
+  /* 模块地图 */
+  .modmap{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+  .mod{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;}
+  .mod b{color:var(--blue2);display:block;margin-bottom:2px;}
+  .mod.g{background:#e8f1fb;border-color:#bcd2ee;}
+  .mod span{color:var(--gray);}
+
+  /* 矩阵 */
+  .matrix{display:grid;grid-template-columns:auto repeat(5,1fr);gap:3px;font-size:11.5px;max-width:540px;margin:0 auto;}
+  .matrix div{padding:7px 3px;text-align:center;border-radius:4px;color:#fff;font-weight:600;}
+  .matrix .hd{background:var(--blue2);}
+  .matrix .ax{background:#eef2f7;color:var(--gray);font-weight:700;}
+  .m-low{background:#2e9e5b;} .m-med{background:#e8a33d;} .m-high{background:#e8733b;} .m-crit{background:#c8102e;}
+
+  /* PDCA */
+  .pdca{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;}
+  .pdca .steps{display:grid;grid-template-columns:1fr 1fr;gap:11px;max-width:420px;}
+  .pdca .st{background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:10px 13px;font-size:13px;}
+  .pdca .st b{color:var(--blue2);}
+
+  /* 甘特 */
+  .gantt{font-size:12px;margin:6px 0;}
+  .g-head,.g-row{display:grid;grid-template-columns:215px 1fr;align-items:center;}
+  .g-head{font-weight:700;color:var(--gray);border-bottom:2px solid var(--line);padding-bottom:5px;margin-bottom:5px;}
+  .g-months{display:grid;grid-template-columns:repeat(9,1fr);text-align:center;color:var(--gray);}
+  .g-row{margin:6px 0;}
+  .g-name{padding-right:9px;font-weight:600;font-size:12px;}
+  .g-track{position:relative;height:24px;background:#f0f4f9;border-radius:6px;overflow:hidden;}
+  .g-bar{position:absolute;top:2px;height:20px;border-radius:5px;background:linear-gradient(90deg,var(--blue2),var(--blue3));display:flex;align-items:center;padding:0 7px;color:#fff;font-size:10.5px;white-space:nowrap;}
+  .g-marks{position:relative;height:16px;margin-top:3px;}
+  .g-dot{position:absolute;top:0;width:2px;height:16px;background:var(--gray);}
+  .g-dot span{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid #fff;}
+  .legend{font-size:12px;color:var(--gray);margin-top:7px;}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 12px;}
+
+  /* 五阶段 */
+  .phases{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;align-items:stretch;}
+  .phase{flex:1;min-width:150px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:11px;text-align:center;}
+  .phase .pn{font-weight:800;color:var(--blue2);font-size:15px;}
+  .phase .pd{font-size:11.5px;color:var(--gray);margin-top:4px;line-height:1.45;}
+
+  /* 监督模式 */
+  .super{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:6px 0;}
+  .super .s{background:linear-gradient(135deg,#1a4d8f,#2f6fb0);color:#fff;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:600;text-align:center;min-width:120px;}
+
+  .foot{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;color:var(--gray);font-size:12px;text-align:center;}
+
+  @media print{
+    #toc{display:none;} #main{margin-left:0;}
+    .cover{height:auto;min-height:0;padding:50px 0;page-break-after:always;}
+    .chapter{page-break-inside:avoid;} .fig,table,.card{break-inside:avoid;}
+    body{background:#fff;} .wrap{max-width:100%;}
+  }
+
+  /* ===== 16 模块详细卡片 ===== */
+  .modcards{display:flex;flex-direction:column;gap:16px;margin-top:10px;}
+  .modcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(20,60,107,.05);background:#fff;}
+  .mc-head{display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(90deg,#143c6b,#1f5fa8);color:#fff;}
+  .mc-no{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#fff;color:var(--blue2);font-weight:800;font-size:15px;flex:none;}
+  .mc-name{font-size:16px;font-weight:700;letter-spacing:.5px;}
+  .mc-tag{margin-left:auto;font-size:12px;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px;}
+  .mc-body{padding:14px 16px;}
+  .mc-ov{font-size:13.5px;line-height:1.8;color:#36465c;margin-bottom:10px;}
+  .mc-ov b{color:var(--blue2);}
+  .mc-flow{display:flex;align-items:stretch;flex-wrap:wrap;gap:0;margin:8px 0 12px;padding:12px;background:#f4f8fc;border:1px dashed #c5d8ec;border-radius:10px;}
+  .mc-step{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-width:92px;flex:1;padding:8px 6px;background:#fff;border:1px solid #d4e3f3;border-radius:8px;box-shadow:0 1px 4px rgba(20,60,107,.06);}
+  .mc-step .s-t{font-size:12.5px;font-weight:700;color:var(--blue2);}
+  .mc-step .s-d{font-size:11px;color:var(--gray);margin-top:3px;line-height:1.4;}
+  .mc-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue2);font-size:18px;font-weight:700;padding:0 4px;flex:none;}
+  .mc-feat{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:4px 0 10px;}
+  .mc-feat .f{background:#f7fafd;border:1px solid #e4edf6;border-left:3px solid var(--blue);border-radius:7px;padding:7px 10px;font-size:12.5px;line-height:1.6;color:#33445a;}
+  .mc-feat .f b{color:var(--blue2);}
+  .mc-spec{font-size:12px;color:#5b6b7e;background:#eef4fb;border-radius:7px;padding:7px 10px;border:1px solid #dde8f4;}
+  .mc-spec b{color:var(--blue2);}
+  @media (max-width:680px){.mc-feat{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav id="toc">
+  <div class="logo">投标技术方案·细化版</div>
+  <div class="sub">生产运行数据分析与归档管理<br>软件升级改造服务</div>
+  <div class="grp">目 录</div>
+  <a href="#c1"><span class="n">1</span>投标单位概况与业绩</a>
+  <a href="#c2"><span class="n">2</span>组织机构及人员配备</a>
+  <a href="#c3"><span class="n">3</span>项目方案</a>
+  <a href="#c3-1"><span class="n">·</span>需求概述/技术方案</a>
+  <a href="#c3-2"><span class="n">·</span>功能设计/性能设计</a>
+  <a href="#c3-3"><span class="n">·</span>进度/现场/风险/质量/文件</a>
+  <a href="#c3-4"><span class="n">·</span>重点难点/范围/职责</a>
+  <a href="#c3-5"><span class="n">·</span>质保/培训/验收/保密</a>
+  <a href="#c4"><span class="n">4</span>进度计划</a>
+  <a href="#c5"><span class="n">5</span>安全质量保证</a>
+  <a href="#c6"><span class="n">6</span>偏离表</a>
+  <a href="#c7"><span class="n">7</span>其他/附录</a>
+</nav>
+
+<div id="main">
+  <header class="cover">
+    <div class="tag">投 标 技 术 文 件</div>
+    <h1>生产运行数据分析与归档管理<br>软件升级改造服务</h1>
+    <h2>投标文件 · 技术部分（细化版）</h2>
+    <div class="redbar"></div>
+    <div class="meta" style="margin-top:28px;">
+      采购编号：【采购编号】<br>
+      招标人（甲方）：【甲方单位名称】<br>
+      服务周期：自合同签订之日起 9 个月<br>
+      质量保障：验收后 18 个月质量保证期
+    </div>
+    <div class="org">投标单位：【投标单位全称】（盖章）</div>
+    <div class="meta" style="margin-top:16px;font-size:12.5px;">二〇二六年 【月】</div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- ============ 第1章 ============ -->
+    <section class="chapter" id="c1">
+      <div class="ch-head"><div class="no">1</div><h2>投标单位概况与业绩</h2></div>
+
+      <div class="sec">
+        <h3>1.1 公司概况</h3>
+        <p>【投标单位全称】（以下简称"我公司"）成立于【成立年份】年，注册资本【金额】万元，长期专注于<span class="note">生产运行数据分析、知识图谱驱动治理、智能归档与全栈国产化适配</span>领域，是一家高新技术企业。公司具备成熟的"核源平台"类软件产品基础，拥有复杂业务数据处理、模型化管理、多源数据融合、效能评估与结果归档的持续迭代能力，可严格遵循"甲方主导、乙方实施、成熟产品支撑、现有基础融合、成果自主可控"的总体原则实施本项目。</p>
+        <div class="grid g4">
+          <div class="card"><div class="k">行业服务年限</div><div class="v">【N】<small> 年</small></div><div class="d">电力/能源行业信息化经验</div></div>
+          <div class="card"><div class="k">自主软件产品</div><div class="v">成熟平台</div><div class="d">数据管理·分析·归档一体化</div></div>
+          <div class="card"><div class="k">同类项目业绩</div><div class="v">【8】<small> 个</small></div><div class="d">数据分析/归档/国产化类</div></div>
+          <div class="card"><div class="k">国产化适配认证</div><div class="v">全栈</div><div class="d">麒麟/统信UOS + 达梦/金仓</div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>1.2 资质与认证</h3>
+        <table>
+          <thead><tr><th class="num">序号</th><th>资质 / 认证名称</th><th>发证机构</th><th>与本项目关联性</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>高新技术企业证书</td><td>【科技主管部门】</td><td>研发与自主创新能力的证明</td></tr>
+            <tr><td class="num">2</td><td>软件企业认定 / 软件产品登记</td><td>【工信主管部门】</td><td>成熟软件产品基础，符合 3.1.2</td></tr>
+            <tr><td class="num">3</td><td>ISO 9001 质量管理体系认证</td><td>【认证机构】</td><td>规范化项目实施与质量控制</td></tr>
+            <tr><td class="num">4</td><td>ISO/IEC 27001 信息安全管理体系</td><td>【认证机构】</td><td>满足 3.4 信息安全与保密要求</td></tr>
+            <tr><td class="num">5</td><td>CMMI【3/5】级 软件能力成熟度</td><td>【评估机构】</td><td>持续迭代与版本质量控制（3.2.2.4）</td></tr>
+            <tr><td class="num">6</td><td>信息系统建设和服务能力（CS）【等级】</td><td>【电子信息行业联合会】</td><td>项目实施与交付能力</td></tr>
+            <tr><td class="num">7</td><td>国产化兼容互认证（麒麟/统信UOS、达梦/人大金仓/openGauss）</td><td>【生态适配中心】</td><td>满足 3.2.1.14 全栈国产化适配</td></tr>
+            <tr><td class="num">8</td><td>信息安全服务资质（软件安全开发类）</td><td>【测评/认证机构】</td><td>满足供应链安全 GB/T 43698-2024</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">注：以上资质请以我公司最新有效证书替换【】中的机构与等级信息，并附证书复印件作为投标附件。</div>
+      </div>
+
+      <div class="sec">
+        <h3>1.3 类似项目业绩</h3>
+        <p>我公司近年承担了多项与"生产运行数据分析、数据治理、智能归档、国产化适配"高度相关的项目，具备同类或类似项目应用经验（满足技术规格书 3.1.2 要求）。典型业绩如下：</p>
+        <table>
+          <thead><tr><th class="num">序号</th><th>项目名称</th><th>甲方单位</th><th>主要内容</th><th>金额(万)</th><th>竣工</th><th>相似点</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>【XX电厂生产运行数据分析平台升级】</td><td>【XX发电公司】</td><td>多源数据接入、指标计算、效能评估、看板</td><td>【】</td><td>【20XX】</td><td>数据分析引擎+指标体系</td></tr>
+            <tr><td class="num">2</td><td>【XX集团数据治理与归档管理系统】</td><td>【XX集团】</td><td>知识图谱治理、智能清洗、全过程留痕归档</td><td>【】</td><td>【20XX】</td><td>知识图谱+智能归档</td></tr>
+            <tr><td class="num">3</td><td>【XX企业国产化适配改造项目】</td><td>【XX单位】</td><td>麒麟/UOS+达梦环境部署、兼容性测试</td><td>【】</td><td>【20XX】</td><td>全栈国产化适配</td></tr>
+            <tr><td class="num">4</td><td>【XX数据中心多源融合分析系统】</td><td>【XX单位】</td><td>多源异构接入、模型管理、对比/趋势分析</td><td>【】</td><td>【20XX】</td><td>复杂数据建模与融合</td></tr>
+            <tr><td class="num">5</td><td>【XX单位审计追溯与保密管理系统】</td><td>【XX单位】</td><td>全链路留痕、权限审计、国密加密</td><td>【】</td><td>【20XX】</td><td>审计追溯+安全保密</td></tr>
+            <tr><td class="num">6</td><td>【XX平台报表与成果输出系统】</td><td>【XX单位】</td><td>AI辅助报表模板、自动化生成、归档关联</td><td>【】</td><td>【20XX】</td><td>报表自动化与归档关联</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">提示：以上为<span class="note">结构与内容示例</span>，请替换为我公司真实合同业绩（含合同首尾页、验收证明等佐证）以佐证"成熟产品+类似项目经验"。</div>
+        <div class="fig">
+          <svg viewBox="0 0 560 220" width="100%" aria-label="业绩分布柱状图">
+            <line x1="50" y1="18" x2="50" y2="180" stroke="#bcd2ee" stroke-width="2"/>
+            <line x1="50" y1="180" x2="540" y2="180" stroke="#bcd2ee" stroke-width="2"/>
+            <g stroke="#eef2f7"><line x1="50" y1="146" x2="540" y2="146"/><line x1="50" y1="112" x2="540" y2="112"/><line x1="50" y1="78" x2="540" y2="78"/><line x1="50" y1="44" x2="540" y2="44"/></g>
+            <g fill="#1a4d8f">
+              <rect x="78" y="146" width="44" height="34" rx="3"/><text x="100" y="138" font-size="11" fill="#143c6b" text-anchor="middle">1</text>
+              <rect x="156" y="118" width="44" height="62" rx="3"/><text x="178" y="110" font-size="11" fill="#143c6b" text-anchor="middle">3</text>
+              <rect x="234" y="92" width="44" height="88" rx="3"/><text x="256" y="84" font-size="11" fill="#143c6b" text-anchor="middle">5</text>
+              <rect x="312" y="78" width="44" height="102" rx="3"/><text x="334" y="70" font-size="11" fill="#143c6b" text-anchor="middle">6</text>
+              <rect x="390" y="58" width="44" height="122" rx="3"/><text x="412" y="50" font-size="11" fill="#143c6b" text-anchor="middle">8</text>
+            </g>
+            <g fill="#c8102e"><rect x="468" y="42" width="44" height="138" rx="3"/><text x="490" y="34" font-size="11" fill="#c8102e" text-anchor="middle">9</text></g>
+            <g font-size="11.5" fill="#5b6675" text-anchor="middle"><text x="100" y="198">2021</text><text x="178" y="198">2022</text><text x="256" y="198">2023</text><text x="334" y="198">2024</text><text x="412" y="198">2025</text><text x="490" y="198">2026</text></g>
+          </svg>
+          <div class="cap">图 1-1 近五年同类项目业绩分布（示例数据，请按实际替换）</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>1.4 自主可控与本地化服务能力</h3>
+        <p>本项目对"自主可控、可审计、可维护、可迁移"要求严格（规格书 3.3）。我公司已构建端到端自主可控能力，可保障成果不被黑盒/私有协议锁定，并在甲方验收后支持独立运维。</p>
+        <div class="grid g3">
+          <div class="card"><h4>产品自主</h4><p class="muted" style="margin:0;">核心能力基于自研成熟平台，非临时拼装原型；源码、组件、脚本完整移交。</p></div>
+          <div class="card"><h4>国产适配</h4><p class="muted" style="margin:0;">已完成麒麟/统信UOS + 达梦/金仓/openGauss 生态兼容互认证。</p></div>
+          <div class="card"><h4>本地响应</h4><p class="muted" style="margin:0;">具备本地化或快速响应能力，可现场/远程支撑，远程经甲方同意并合规。</p></div>
+          <div class="card"><h4>供应链透明</h4><p class="muted" style="margin:0;">交付完整 SBOM，承诺无 CVSS≥4.0 未修复漏洞，≥3 年安全更新。</p></div>
+          <div class="card"><h4>安全保密</h4><p class="muted" style="margin:0;">无后门/隐藏账号/未授权外联；国密加密、安全基线巡检。</p></div>
+          <div class="card"><h4>独立运维</h4><p class="muted" style="margin:0;">验收后甲方可独立备份恢复、权限调整、参数配置与故障排查。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第2章 ============ -->
+    <section class="chapter" id="c2">
+      <div class="ch-head"><div class="no">2</div><h2>项目组织机构及人员配备</h2></div>
+
+      <div class="sec">
+        <h3>2.1 项目组织管理机构</h3>
+        <p>我公司遵循"甲方主导、乙方实施"原则，成立专职项目团队，设置项目领导小组统筹资源，项目经理负责全程交付，下设技术架构、开发实施、数据治理、测试质量、部署运维五个工作组，并配置专职质量安全与保密管理员，确保 80 人月以上投入与人员稳定（未经甲方同意不随意更换，满足 3.5.2、5.0 要求）。</p>
+        <div class="fig">
+          <div class="org-flow">
+            <div class="box lead">项目领导小组（公司分管副总 / 项目总监）</div>
+            <div class="arrow-v"></div>
+            <div class="box">项目经理（本科·8年+，统筹计划/资源/质量/验收）</div>
+            <div class="arrow-v"></div>
+            <div class="org-row">
+              <div class="box sub">技术负责人 /<br>资深架构师</div>
+              <div class="box sub">数据治理组<br>组长</div>
+              <div class="box sub">测试与质量组<br>组长</div>
+              <div class="box sub">部署运维组<br>组长</div>
+              <div class="box sub">质量安全与<br>保密管理员</div>
+            </div>
+            <div class="arrow-v"></div>
+            <div class="org-row">
+              <div class="box leaf">开发工程师</div>
+              <div class="box leaf">实施工程师</div>
+              <div class="box leaf">数据分析工程师</div>
+              <div class="box leaf">测试工程师</div>
+              <div class="box leaf">运维支持工程师</div>
+            </div>
+          </div>
+          <div class="cap">图 2-1 项目组织管理机构图</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>2.2 人员配备计划</h3>
+        <p>项目总投入不少于 <b>80 人月</b>（满足 5.0 人员要求），核心角色配置如下：</p>
+        <table>
+          <thead><tr><th class="num">序号</th><th>人员类型</th><th>人数</th><th>文化程度 / 经验</th><th>资质及经验要求（对应规格书）</th><th>投入人月</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>项目经理</td><td>1</td><td>本科 / 8年+</td><td>熟悉软件全生命周期；掌握 Axure/Project/Visio/Office；协调与计划管理能力强</td><td>9</td></tr>
+            <tr><td class="num">2</td><td>资深架构师 / 技术负责人</td><td>1</td><td>本科10年+ / 硕士5年+</td><td>精通 SpringCloud 生态；高并发高可用架构；熟悉 MQ/Redis/MongoDB；熟 Docker/K8s</td><td>9</td></tr>
+            <tr><td class="num">3</td><td>开发工程师</td><td>4</td><td>大专7年+ / 本科3年+</td><td>精通 Java/SpringBoot；Oracle/MySQL/NoSQL；Kafka/Redis/Spark/ES/Hadoop；Linux/Shell</td><td>36</td></tr>
+            <tr><td class="num">4</td><td>数据分析 / 模型工程师</td><td>1</td><td>本科 / 5年+</td><td>指标体系、数据模型、效能评估、知识图谱与 AI 辅助建模</td><td>9</td></tr>
+            <tr><td class="num">5</td><td>实施 / 部署工程师</td><td>1</td><td>本科 / 4年+</td><td>系统部署、环境配置、接口联调、数据处理、用户培训、现场问题处理</td><td>9</td></tr>
+            <tr><td class="num">6</td><td>测试工程师</td><td>1</td><td>本科 / 3年+</td><td>功能/接口/数据/性能/安全/国产化适配测试；用例与缺陷闭环</td><td>6</td></tr>
+            <tr><td class="num">7</td><td>运维支持工程师</td><td>1</td><td>本科 / 3年+</td><td>运行监控、告警、备份恢复、故障排查、国产化环境支撑</td><td>4</td></tr>
+            <tr><td class="num" style="background:#fdecef;color:#c8102e;font-weight:700;">计</td><td style="font-weight:700;">合计</td><td style="font-weight:700;">10</td><td>—</td><td>—</td><td style="font-weight:700;color:#c8102e;">82 人月</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">注：人月核算覆盖 9 个月周期；项目经理与核心人员每周赴甲方现场进行阶段性成果交付、调试与汇报（满足规格书 3.0 注及 3.5 现场要求）。</div>
+        <div class="fig">
+          <svg viewBox="0 0 420 220" width="100%" aria-label="人月投入饼图">
+            <g transform="translate(140,115)">
+              <circle r="88" fill="#eef2f7"/>
+              <path d="M0,0 L0,-88 A88,88 0 0,1 85.7,-19.9 Z" fill="#1a4d8f"/>
+              <path d="M0,0 L85.7,-19.9 A88,88 0 0,1 67.4,56.3 Z" fill="#2f6fb0"/>
+              <path d="M0,0 L67.4,56.3 A88,88 0 0,1 -19.9,85.7 Z" fill="#3f86c4"/>
+              <path d="M0,0 L-19.9,85.7 A88,88 0 0,1 -85.7,19.9 Z" fill="#5aa0d4"/>
+              <path d="M0,0 L-85.7,19.9 A88,88 0 0,1 -68.6,-55.3 Z" fill="#7bb6e0"/>
+              <path d="M0,0 L-68.6,-55.3 A88,88 0 0,1 0,-88 Z" fill="#c8102e"/>
+              <circle r="46" fill="#fff"/>
+              <text x="0" y="-3" font-size="19" font-weight="800" fill="#143c6b" text-anchor="middle">82</text>
+              <text x="0" y="15" font-size="10.5" fill="#5b6675" text-anchor="middle">人月</text>
+            </g>
+            <g font-size="12" fill="#1f2733">
+              <rect x="262" y="36" width="13" height="13" fill="#1a4d8f"/><text x="281" y="47">开发 36</text>
+              <rect x="262" y="60" width="13" height="13" fill="#2f6fb0"/><text x="281" y="71">架构 9</text>
+              <rect x="262" y="84" width="13" height="13" fill="#3f86c4"/><text x="281" y="95">项目经理 9</text>
+              <rect x="262" y="108" width="13" height="13" fill="#5aa0d4"/><text x="281" y="119">数据/实施 18</text>
+              <rect x="262" y="132" width="13" height="13" fill="#7bb6e0"/><text x="281" y="143">测试 6</text>
+              <rect x="262" y="156" width="13" height="13" fill="#c8102e"/><text x="281" y="167">运维 4</text>
+            </g>
+          </svg>
+          <div class="cap">图 2-2 项目人月投入结构（合计 82 人月，≥80 人月要求）</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>2.3 核心人员简历（摘要）</h3>
+        <div class="grid g3">
+          <div class="card"><h4 style="margin-top:0;">项目经理 · 【姓名】</h4>
+            <dl class="kv"><dt>学历/经验</dt><dd>本科 / 10年</dd><dt>持证</dt><dd>【PMP / 软考高项】</dd><dt>典型项目</dt><dd>【XX数据分析平台】等 6 个同类</dd><dt>职责</dt><dd>统筹计划/资源/质量/验收/现场</dd></dl></div>
+          <div class="card"><h4 style="margin-top:0;">资深架构师 · 【姓名】</h4>
+            <dl class="kv"><dt>学历/经验</dt><dd>硕士 / 12年</dd><dt>技术</dt><dd>SpringCloud / 高并发 / 微服务治理</dd><dt>典型项目</dt><dd>【XX集团数据治理】架构设计</dd><dt>职责</dt><dd>总体架构/国产化方案/技术决策</dd></dl></div>
+          <div class="card"><h4 style="margin-top:0;">开发负责人 · 【姓名】</h4>
+            <dl class="kv"><dt>学历/经验</dt><dd>本科 / 8年</dd><dt>技术</dt><dd>Java/SpringBoot/Kafka/Spark/ES</dd><dt>典型项目</dt><dd>【XX多源融合分析系统】</dd><dt>职责</dt><dd>核心开发/接口适配/二次开发</dd></dl></div>
+        </div>
+        <div class="tip">注：投标时请附核心人员身份证、学历、职称/证书、社保证明及类似项目经历佐证；人员应保持稳定，更换需经甲方同意。</div>
+      </div>
+
+      <div class="sec">
+        <h3>2.4 人员稳定性与保密管理</h3>
+        <ul class="clean">
+          <li><b>人员锁定：</b>核心人员合同期锁定，设 AB 角备份，未经甲方书面同意不更换。</li>
+          <li><b>考勤工时：</b>每月提交经现场负责人签字确认的考勤工时统计表及工作日志（覆盖 ≥60 人月），作为进度款支付前置依据。</li>
+          <li><b>保密承诺：</b>全员签署保密协议，遵守甲方保密制度；离场/项目结束完成资料清退、账号注销、数据删除与保密确认。</li>
+          <li><b>背景审查：</b>涉甲方数据与系统人员通过背景审查，落实最小权限与操作留痕。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ 第3章 ============ -->
+    <section class="chapter" id="c3">
+      <div class="ch-head"><div class="no">3</div><h2>项目方案</h2></div>
+      <p class="muted">本章为技术方案核心，严格对应技术规格书第 3.0 章要求，涵盖需求概述、技术路线、技术要求、功能设计、性能设计、进度/现场/风险/质量/文件管理、重点难点、采购范围、规范法规、甲乙双方职责、资质人员、物质、文件、质保、培训、验收与知识产权保密。</p>
+
+      <!-- 3.1 需求概述 -->
+      <div class="sec" id="c3-1">
+        <h3>3.1 需求概述</h3>
+        <h4>3.1.1 项目名称</h4>
+        <p>生产运行数据分析与归档管理软件升级改造服务。</p>
+        <h4>3.1.2 项目概述</h4>
+        <p>甲方前期已围绕生产运行数据采集、整理、分析、成果归档、系统集成及业务应用形成明确业务与数据基础。本项目基于"核源平台"开展软件升级改造服务，坚持<span class="note">甲方主导、乙方实施、成熟产品支撑、现有基础融合、成果自主可控</span>原则，乙方按甲方既定设计、功能、数据标准、接口规范、安全要求与国产化适配要求，完成产品升级、适配融合、部署调试、测试验证与运行支撑。本项目不属于从零新建，也非将甲方核心业务逻辑整体外包。</p>
+        <h4>3.1.3 项目核心目标</h4>
+        <div class="grid g3">
+          <div class="card"><h4>能力提升</h4><p class="muted" style="margin:0;">提升数据分析、归档管理、系统融合与国产化适配四项核心能力。</p></div>
+          <div class="card"><h4>融合降险</h4><p class="muted" style="margin:0;">成熟产品与甲方既有基础快速融合，降低重复建设成本与实施风险。</p></div>
+          <div class="card"><h4>连续可控</h4><p class="muted" style="margin:0;">保障项目连续性、稳定性与交付质量，成果自主可控、可审计、可迁移。</p></div>
+        </div>
+      </div>
+
+      <!-- 3.2 技术方案 -->
+      <div class="sec">
+        <h3>3.2 技术方案</h3>
+
+        <h4>3.2.1 项目特点分析</h4>
+        <div class="grid g2">
+          <div class="card"><h4>① 升级融合而非新建</h4><p class="muted" style="margin:0;">基于成熟平台既有基础升级，须与已有数据/接口/规则/系统有效融合，不得要求甲方大幅改变既有标准（3.1.1）。</p></div>
+          <div class="card"><h4>② 数据复杂、关联强</h4><p class="muted" style="margin:0;">数据来源多样、结构复杂、时间连续、指标关联、业务规则强，需复杂建模与效能评估（3.1.3）。</p></div>
+          <div class="card"><h4>③ 全栈国产化适配</h4><p class="muted" style="margin:0;">适配银河麒麟/统信 UOS + 达梦/人大金仓/openGauss，通过兼容性测试与验收（3.2.1.14）。</p></div>
+          <div class="card"><h4>④ 安全保密要求高</h4><p class="muted" style="margin:0;">内网运行、不得外联；满足 GB/T 43698-2024、提供 SBOM、无 CVSS≥4.0 未修复漏洞（3.3/3.4）。</p></div>
+          <div class="card"><h4>⑤ 自主可控与可追溯</h4><p class="muted" style="margin:0;">成果自主可控、可审计；关键数据治理全过程留痕（3.3、3.2.1.3）。</p></div>
+          <div class="card"><h4>⑥ 周期紧、现场强</h4><p class="muted" style="margin:0;">9 个月内完成 8 大里程碑；每周核心人员现场交付、调试与汇报（4.0、3.0 注）。</p></div>
+        </div>
+
+        <h4>3.2.2 技术路线</h4>
+        <p>采用"成熟产品 + 配置化改造 + 二次开发 + 接口适配"技术路线，分层解耦、模块化、可配置、易扩展，技术栈全栈自主可控并适配国产化环境。</p>
+        <div class="fig">
+          <div class="layers">
+            <div class="layer l1"><div class="lab">展示层</div><div class="items">可配置可视化看板 / 统计卡片 / 报表成果输出；按权限分级展示（3.2.1.6、3.2.1.10）</div></div>
+            <div class="layer l2"><div class="lab">应用层</div><div class="items">数据管理、查询分析、效能评估、归档管理、审计追溯、权限管理、系统管理（16 大功能模块）</div></div>
+            <div class="layer l3"><div class="lab">分析引擎层</div><div class="items">数据分析引擎 / 指标计算 / 模型管理 / 效能评估 / 知识图谱治理 / AI 辅助建模</div></div>
+            <div class="layer l4"><div class="lab">数据治理层</div><div class="items">智能清洗·转换·标准化·编码转换·质量规则推荐；处理前/后数据·规则·日志全链路留痕（3.2.1.3）</div></div>
+            <div class="layer l5"><div class="lab">数据接入层</div><div class="items">库直连/接口/文件/批量/定时/手工；结构化·半结构化·文件类数据接入与校验（3.2.1.2）</div></div>
+            <div class="layer l6"><div class="lab">数据源层</div><div class="items">业务系统·数据平台·数据库·接口服务·Excel/CSV/JSON/XML/文档/图片等多源异构数据</div></div>
+          </div>
+          <div class="cross">
+            <div class="c">↔ 国产化适配：麒麟/统信UOS + 达梦/金仓/openGauss + 国密算法</div>
+            <div class="c">🔒 安全保密：ABAC+RBAC / 国密加密 / 安全基线巡检 / 区块链级审计</div>
+            <div class="c">🔗 接口集成：标准化·配置化·图形化多系统对接</div>
+            <div class="c">🛠 运维监控：全链路监控·智能告警·异常自愈·分布式部署</div>
+          </div>
+          <div class="cap">图 3-1 系统技术路线分层架构图</div>
+        </div>
+        <h4>关键技术选型（适配国产化）</h4>
+        <table>
+          <thead><tr><th>层次</th><th>技术 / 组件</th><th>国产化替代</th></tr></thead>
+          <tbody>
+            <tr><td>操作系统</td><td>Linux 系</td><td>银河麒麟 / 统信 UOS</td></tr>
+            <tr><td>数据库</td><td>MySQL / Oracle</td><td>达梦 DM / 人大金仓 Kingbase / openGauss</td></tr>
+            <tr><td>中间件</td><td>Redis / Kafka / RabbitMQ</td><td>东方通 TongRDS / 宝兰德 / 普元（按需）</td></tr>
+            <tr><td>后端框架</td><td>Spring Boot / Spring Cloud</td><td>同左（开源，许可证合规）</td></tr>
+            <tr><td>大数据</td><td>Spark / Elasticsearch / Hadoop</td><td>适配国产服务器集群部署</td></tr>
+            <tr><td>加密</td><td>SM2/SM3/SM4 国密算法</td><td>满足安全保密与国密合规</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3.2.3 技术要求 -->
+      <div class="sec">
+        <h4>3.2.3 技术要求</h4>
+        <h4>3.2.3.1 总体技术架构要求</h4>
+        <ul class="clean">
+          <li><b>架构原则：</b>成熟、稳定、开放、可维护，具备良好模块化、配置化、扩展性与兼容性；不以产品限制要求甲方改变既有业务流程、数据标准、接口规范与管理制度（3.1.1）。</li>
+          <li><b>系统分层架构：</b>数据源 → 接入 → 治理 → 分析引擎 → 应用 → 展示，六层解耦，横切国产化、安全保密、接口集成、运维监控。</li>
+        </ul>
+        <h4>3.2.3.2 功能模块技术要求</h4>
+        <p>覆盖数据管理、清洗治理、模型指标、查询分析、可视化、效能评估、归档、审计、报表、接口、权限、系统管理、国产化、安全保密、运维监控、部署上线等 16 大类能力（详见 3.2.4 功能设计）。</p>
+        <h4>3.2.3.3 性能技术要求</h4>
+        <ul class="clean">
+          <li><b>资源使用：</b>常规页面访问、查询、筛选、统计展示具备良好响应速度；按实际数据/用户/并发规模优化。</li>
+          <li><b>系统响应：</b>大批量导入、复杂统计、批量归档、报表生成等耗时操作支持后台任务处理，提供状态/进度/结果/失败原因提示（3.2.2.1）。</li>
+        </ul>
+        <h4>3.2.3.4 开发与运维技术要求</h4>
+        <ul class="clean">
+          <li><b>开发环境：</b>工具/组件来源合法、安全正版，符合甲方信息安全与软件正版化要求（3.2.3.2）。</li>
+          <li><b>运维管理：</b>支持运行监控、服务健康、任务/接口/数据/日志监控与异常告警，配合运行支撑配置与故障排查（3.2.1.16）。</li>
+        </ul>
+        <h4>3.2.3.5 安全技术要求</h4>
+        <ul class="clean">
+          <li><b>网络安全：</b>系统在内网或指定网络独立运行，不强制依赖外部互联网/境外云/外部账号/不可控远程（3.2.3.1）。</li>
+          <li><b>数据安全：</b>分级管理、关键操作日志审计、导出/下载受控、无隐藏账号/后门/未授权外联（3.2.1.15）。</li>
+          <li><b>应用安全：</b>身份认证、权限控制、敏感操作审批、文件上传下载控制、数据导出控制、归档成果保护（3.4）。</li>
+        </ul>
+      </div>
+
+      <!-- 3.2.4 功能设计 -->
+      <div class="sec" id="c3-2">
+        <h4>3.2.4 功能设计（16 大功能模块）</h4>
+        <p>基于规格书第 2.0 章 17 项服务内容与 3.2.1 功能要求，将系统功能归纳为四大类 16 个模块，形成如下功能地图：</p>
+        <div class="fig">
+          <div class="modmap">
+            <div class="mod g"><b>数据基座层</b><span></span></div>
+            <div class="mod"><b>数据管理</b><span>多源异构统一管理、智能清洗、知识图谱治理</span></div>
+            <div class="mod"><b>清洗治理</b><span>标准化·编码转换·质量规则推荐·全程留痕</span></div>
+            <div class="mod"><b>模型指标</b><span>数据对象·指标体系·计算规则·版本管理</span></div>
+            <div class="mod"><b>查询分析</b><span>多条件组合·趋势/对比/分布/异常分析</span></div>
+            <div class="mod g"><b>分析展示层</b><span></span></div>
+            <div class="mod"><b>可视化</b><span>可配置看板·统计卡片·权限分级展示</span></div>
+            <div class="mod"><b>效能评估</b><span>多指标综合·多样本对比·趋势分析·报告归档</span></div>
+            <div class="mod"><b>报表成果</b><span>AI辅助模板·自动化生成·多格式输出</span></div>
+            <div class="mod g"><b>归档审计层</b><span></span></div>
+            <div class="mod"><b>归档管理</b><span>知识图谱分类·语义检索·元数据关联·可追溯</span></div>
+            <div class="mod"><b>操作留痕审计</b><span>全链路留痕·区块链级审计·不可篡改</span></div>
+            <div class="mod g"><b>集成与支撑层</b><span></span></div>
+            <div class="mod"><b>接口集成</b><span>第三方系统标准化·图形化对接</span></div>
+            <div class="mod"><b>权限管理</b><span>ABAC+RBAC·字段级访问控制</span></div>
+            <div class="mod"><b>系统管理</b><span>参数化配置·可视化调度·异常自愈</span></div>
+            <div class="mod"><b>国产化适配</b><span>麒麟/UOS+达梦/金仓/openGauss 认证</span></div>
+            <div class="mod"><b>安全保密</b><span>国密加密·安全基线巡检·保密管理</span></div>
+            <div class="mod"><b>运维监控</b><span>全链路监控·智能告警·自动化运维</span></div>
+            <div class="mod"><b>部署上线</b><span>部署·测试·上线·验收支撑</span></div>
+            <div class="mod"><b>文档培训</b><span>技术文档·培训交底·成果移交</span></div>
+          </div>
+          <div class="cap">图 3-2 系统功能模块地图（16 模块 / 4 大类）</div>
+        </div>
+        <h4>16 大功能模块详细设计</h4>
+        <p class="muted">以下对每个功能模块从<b>功能定位、核心处理流程（图例）、主要功能、对应规格书条款</b>四个维度逐一详述，全流程满足国产化、安全保密与可追溯要求。</p>
+        <div class="modcards">
+
+          <!-- M1 数据管理 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">01</span><span class="mc-name">数据管理</span><span class="mc-tag">数据基座层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>面向生产运行多源异构数据的统一接入、注册、编目与生命周期管理，是系统的数据基座。为清洗治理、模型指标、查询分析等上游模块提供标准化、可溯源的数据供给。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">数据源接入</span><span class="s-d">库/文件/接口/流式</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">元数据注册</span><span class="s-d">统一编目</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">采集调度</span><span class="s-d">增量/全量</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">分层存储</span><span class="s-d">ODS/DW/ADS</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">数据溯源</span><span class="s-d">字段级血缘</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>多源异构接入：</b>支持关系库、文件、API、消息流等多类数据源统一接入。</div>
+                <div class="f"><b>数据源注册与编目：</b>统一元数据管理，形成数据目录树与资产视图。</div>
+                <div class="f"><b>采集调度：</b>可视化配置采集任务、频率与增量/全量策略。</div>
+                <div class="f"><b>数据血缘与溯源：</b>字段级血缘追踪，处理全程可追溯。</div>
+                <div class="f"><b>分层存储：</b>ODS/DW/ADS 分层，冷热数据分离。</div>
+                <div class="f"><b>质量基线：</b>对接清洗治理，形成并维护数据质量基线。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1.1～3.2.1.2 数据管理要求（多源数据统一管理、元数据与目录、采集调度）。</div>
+            </div>
+          </div>
+
+          <!-- M2 清洗治理 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">02</span><span class="mc-name">清洗治理</span><span class="mc-tag">数据基座层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>面向生产运行数据的标准化清洗与质量治理，保障进入分析环节的数据准确、完整、一致、可追溯，是数据价值释放的质量闸门。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">字段标准化</span><span class="s-d">命名/类型/单位</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">编码转换</span><span class="s-d">业务编码映射</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">缺失/重复处理</span><span class="s-d">补全/去重</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">逻辑一致性校验</span><span class="s-d">规则校验</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">质量报告</span><span class="s-d">总量/有效量/异常</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>字段标准化：</b>命名、类型、单位、格式统一规范。</div>
+                <div class="f"><b>编码转换：</b>业务编码映射与统一转换。</div>
+                <div class="f"><b>缺失/重复处理：</b>智能补全、去重与异常标记。</div>
+                <div class="f"><b>逻辑校验：</b>业务规则、逻辑关系、范围校验。</div>
+                <div class="f"><b>质量规则推荐：</b>基于数据特征智能推荐校验规则。</div>
+                <div class="f"><b>质量报告：</b>数据总量/有效量/异常原因，可查询导出。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1.3，关键数据须保留处理前/后数据、规则与日志，全程留痕。</div>
+            </div>
+          </div>
+
+          <!-- M3 模型指标 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">03</span><span class="mc-name">模型指标</span><span class="mc-tag">数据基座层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>以业务规则驱动的数据对象与指标体系建模，支撑多源关联计算与模型版本管理，解决"口径不一、重复建设"问题。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">对象建模</span><span class="s-d">业务域定义</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">指标定义</span><span class="s-d">口径/规则</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">多源关联计算</span><span class="s-d">跨源聚合</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">模型版本管理</span><span class="s-d">快照/回退</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">变更留痕</span><span class="s-d">全程审计</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>数据对象管理：</b>按业务域定义对象与分类。</div>
+                <div class="f"><b>指标体系：</b>指标、统计口径、计算规则、展示维度。</div>
+                <div class="f"><b>多源关联计算：</b>跨源数据关联与聚合计算。</div>
+                <div class="f"><b>模型版本管理：</b>版本快照、对比与回退。</div>
+                <div class="f"><b>变更留痕：</b>规则/口径变更全程审计。</div>
+                <div class="f"><b>指标共享：</b>指标复用，避免口径不一致。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1.4 数据模型与指标体系要求。</div>
+            </div>
+          </div>
+
+          <!-- M4 查询分析 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">04</span><span class="mc-name">查询分析</span><span class="mc-tag">数据基座层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>面向业务与管理人员的一站式查询与多维分析能力，将治理后的数据转化为可决策的信息。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">条件组合</span><span class="s-d">灵活筛选</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">即席查询</span><span class="s-d">自定义维度</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">多维分析</span><span class="s-d">趋势/对比/分布</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">钻取下探</span><span class="s-d">汇总→明细</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">异常识别</span><span class="s-d">智能告警</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>多条件组合查询：</b>灵活筛选、保存与复用查询。</div>
+                <div class="f"><b>趋势/对比/分布/异常分析：</b>内置分析模板。</div>
+                <div class="f"><b>数据钻取：</b>从汇总到明细逐层下探。</div>
+                <div class="f"><b>即席分析：</b>自定义维度与度量。</div>
+                <div class="f"><b>结果导出：</b>多格式、权限受控导出。</div>
+                <div class="f"><b>查询性能：</b>预计算+索引保障响应速度。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1.5～3.2.1.6 查询与分析要求。</div>
+            </div>
+          </div>
+
+          <!-- M5 可视化 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">05</span><span class="mc-name">可视化</span><span class="mc-tag">分析展示层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>可配置的可视化展示体系，按角色与权限分级呈现生产运行态势，让数据"看得懂、用得上"。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">看板配置</span><span class="s-d">拖拽布局</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">图表组件</span><span class="s-d">多类型组件</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">交互联动</span><span class="s-d">下钻/联动</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">权限分级渲染</span><span class="s-d">角色差异化</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">多端适配</span><span class="s-d">大屏/PC</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>可配置看板：</b>拖拽式布局、组件复用。</div>
+                <div class="f"><b>图表组件库：</b>折线/柱状/饼图/热力/仪表盘等。</div>
+                <div class="f"><b>交互联动：</b>筛选联动、下钻、联动高亮。</div>
+                <div class="f"><b>权限分级展示：</b>按角色/密级差异化呈现。</div>
+                <div class="f"><b>大屏/驾驶舱：</b>关键指标一屏总览。</div>
+                <div class="f"><b>刷新策略：</b>看板刷新频率可配置，避免页面阻塞。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1 可视化展示要求（可按角色、密级分级展示）。</div>
+            </div>
+          </div>
+
+          <!-- M6 效能评估 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">06</span><span class="mc-name">效能评估</span><span class="mc-tag">分析展示层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>按权重/评分/阈值/等级/分类规则的综合效能评估引擎，支持多样本对比与趋势分析，是生产运行评价的核心工具。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">评估方案配置</span><span class="s-d">权重/阈值</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">多指标加权计算</span><span class="s-d">综合评分</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">多样本对比</span><span class="s-d">横向比对</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">趋势分析</span><span class="s-d">时序预警</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">报告归档</span><span class="s-d">对接归档</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>评估模型配置：</b>权重、评分、阈值、等级、分类规则。</div>
+                <div class="f"><b>综合计算：</b>多指标加权综合评分。</div>
+                <div class="f"><b>多样本/批次/场景对比：</b>横向纵向比对。</div>
+                <div class="f"><b>趋势分析：</b>时序变化趋势与预警。</div>
+                <div class="f"><b>计算过程可追溯：</b>参数与中间结果留痕。</div>
+                <div class="f"><b>评估报告自动归档：</b>对接归档管理模块。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1.7 效能评估要求（参数、过程可追溯）。</div>
+            </div>
+          </div>
+
+          <!-- M7 报表成果 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">07</span><span class="mc-name">报表成果</span><span class="mc-tag">分析展示层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>以 AI 辅助的报表模板与自动化生成引擎，将分析结果转化为规范化成果文档，减轻人工编报负担。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">模板配置</span><span class="s-d">AI辅助</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">数据抽取</span><span class="s-d">自动填充</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">自动生成</span><span class="s-d">一键产出</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">多格式输出</span><span class="s-d">Word/PDF/Excel</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">批量/定时</span><span class="s-d">周期生成</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>AI 辅助模板：</b>智能推荐版式与内容结构。</div>
+                <div class="f"><b>自动化生成：</b>一键生成、字段自动填充。</div>
+                <div class="f"><b>多格式输出：</b>Word/PDF/Excel 等。</div>
+                <div class="f"><b>批量生成：</b>按批次/范围批量产出。</div>
+                <div class="f"><b>定时任务：</b>周期性与触发式生成。</div>
+                <div class="f"><b>成果复核：</b>生成后人工复核留痕。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1 报表成果要求（AI 辅助、自动化、多格式）。</div>
+            </div>
+          </div>
+
+          <!-- M8 归档管理 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">08</span><span class="mc-name">归档管理</span><span class="mc-tag">归档审计层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>基于知识图谱分类的归档管理能力，实现成果文件与数据的规范化、可追溯归档，是项目交付与长期保存的核心。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">归档分类</span><span class="s-d">知识图谱</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">元数据关联</span><span class="s-d">文件-数据-指标</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">完整性校验</span><span class="s-d">三性校验</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">语义检索</span><span class="s-d">以文/图检索</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">状态跟踪</span><span class="s-d">全过程留痕</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>十项管理：</b>目录/分类/批次/文件/数据/状态/校验/查询/统计/日志。</div>
+                <div class="f"><b>知识图谱分类：</b>语义化分类与关联。</div>
+                <div class="f"><b>元数据关联：</b>文件—数据—指标关联。</div>
+                <div class="f"><b>三性校验：</b>完整性、规范性、一致性校验。</div>
+                <div class="f"><b>语义检索：</b>以图检索、以文检索。</div>
+                <div class="f"><b>全过程留痕：</b>归档操作可追溯。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1.8 归档管理（十项管理 + 三性校验 + 留痕）。</div>
+            </div>
+          </div>
+
+          <!-- M9 操作留痕审计 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">09</span><span class="mc-name">操作留痕审计</span><span class="mc-tag">归档审计层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>全链路操作留痕与防篡改审计，满足安全保密与合规追溯要求，是系统可信运行的"黑匣子"。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">操作采集</span><span class="s-d">全场景</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">全链路留痕</span><span class="s-d">10类关键操作</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">防篡改存储</span><span class="s-d">哈希/存证</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">审计追溯</span><span class="s-d">多维追溯</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">审计报表</span><span class="s-d">合规输出</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>全链路留痕：</b>登录/查询/导入导出/修改/归档/权限变更/配置变更/接口调用/任务执行/异常。</div>
+                <div class="f"><b>防篡改：</b>哈希校验或区块链级存证。</div>
+                <div class="f"><b>审计追溯：</b>按用户/对象/时间多维追溯。</div>
+                <div class="f"><b>异常监测：</b>异常操作实时告警。</div>
+                <div class="f"><b>审计报表：</b>合规报表一键生成。</div>
+                <div class="f"><b>留存策略：</b>按密级与法规留存。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1.9 审计追溯要求（不可篡改、关键操作全覆盖）。</div>
+            </div>
+          </div>
+
+          <!-- M10 接口集成 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">10</span><span class="mc-name">接口集成</span><span class="mc-tag">集成与支撑层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>标准化、图形化的第三方系统对接能力，保障数据互通与业务协同，打破信息孤岛。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">数据源对接</span><span class="s-d">业务/设备</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">图形化配置</span><span class="s-d">低代码</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">标准化接口</span><span class="s-d">REST/MQ</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">数据交换</span><span class="s-d">双向同步</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">调用审计</span><span class="s-d">全程留痕</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>第三方对接：</b>业务系统、设备系统标准化接入。</div>
+                <div class="f"><b>图形化配置：</b>零代码/低代码对接。</div>
+                <div class="f"><b>标准化接口：</b>REST/消息队列，统一协议。</div>
+                <div class="f"><b>数据交换：</b>双向同步、增量同步。</div>
+                <div class="f"><b>接口治理：</b>限流、鉴权、监控。</div>
+                <div class="f"><b>调用审计：</b>接口调用全程留痕。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1 接口集成要求（第三方系统标准化、图形化对接）。</div>
+            </div>
+          </div>
+
+          <!-- M11 权限管理 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">11</span><span class="mc-name">权限管理</span><span class="mc-tag">集成与支撑层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>融合 RBAC 与 ABAC 的细粒度、多密级权限控制体系，落实"最小授权、按需访问"的安全原则。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">身份鉴别</span><span class="s-d">统一认证</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">角色/属性授权</span><span class="s-d">RBAC+ABAC</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">字段级控制</span><span class="s-d">表/字段/行</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">数据权限</span><span class="s-d">部门/密级</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">动态鉴权</span><span class="s-d">实时校验</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>RBAC+ABAC：</b>角色与属性双模型授权。</div>
+                <div class="f"><b>字段级访问控制：</b>表/字段/行级权限。</div>
+                <div class="f"><b>数据权限：</b>按部门/密级/范围授权。</div>
+                <div class="f"><b>多密级管理：</b>对应保密分级。</div>
+                <div class="f"><b>单点登录：</b>统一认证、会话管理。</div>
+                <div class="f"><b>权限变更审计：</b>授权全程留痕。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.2 安全与权限要求（字段级访问控制、多密级）。</div>
+            </div>
+          </div>
+
+          <!-- M12 系统管理 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">12</span><span class="mc-name">系统管理</span><span class="mc-tag">集成与支撑层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>参数化、可视化的系统运行管理中枢，支撑任务调度与异常自愈，保障系统长期稳定运行。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">参数配置</span><span class="s-d">字典/业务</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">可视化调度</span><span class="s-d">任务编排</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">任务监控</span><span class="s-d">进度/重试</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">异常自愈</span><span class="s-d">恢复续跑</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">日志归集</span><span class="s-d">统一收集</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>参数化配置：</b>系统参数、字典、业务配置。</div>
+                <div class="f"><b>可视化调度：</b>任务编排、依赖管理。</div>
+                <div class="f"><b>任务监控：</b>状态、进度、失败重试。</div>
+                <div class="f"><b>异常自愈：</b>常见异常自动恢复、续跑。</div>
+                <div class="f"><b>日志归集：</b>运行日志统一收集。</div>
+                <div class="f"><b>公告与字典：</b>基础数据维护。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.1 系统管理要求（参数化配置、可视化调度、异常自愈）。</div>
+            </div>
+          </div>
+
+          <!-- M13 国产化适配 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">13</span><span class="mc-name">国产化适配</span><span class="mc-tag">集成与支撑层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>全栈国产化技术路线适配，满足自主可控与生态兼容要求，是项目合规交付的硬性前提。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">国产OS适配</span><span class="s-d">麒麟/UOS</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">国产库适配</span><span class="s-d">达梦/金仓</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">中间件适配</span><span class="s-d">消息/缓存</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">浏览器适配</span><span class="s-d">国产浏览器</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">兼容认证</span><span class="s-d">互认证书</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>国产操作系统：</b>麒麟、统信 UOS 适配。</div>
+                <div class="f"><b>国产数据库：</b>达梦、人大金仓、openGauss。</div>
+                <div class="f"><b>国产中间件：</b>消息/缓存/应用服务器。</div>
+                <div class="f"><b>浏览器适配：</b>国产浏览器兼容。</div>
+                <div class="f"><b>性能调优：</b>国产环境性能优化。</div>
+                <div class="f"><b>生态兼容认证：</b>取得兼容性互认证书。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>第 2.0 / 3.2 国产化适配与自主可控要求。</div>
+            </div>
+          </div>
+
+          <!-- M14 安全保密 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">14</span><span class="mc-name">安全保密</span><span class="mc-tag">集成与支撑层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>覆盖数据全生命周期的安全保密体系，落实国密算法与基线防护，是项目不可逾越的合规底线。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">身份安全</span><span class="s-d">强鉴别</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">传输加密</span><span class="s-d">国密TLS</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">存储加密</span><span class="s-d">SM4</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">安全基线巡检</span><span class="s-d">定期核查</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">漏洞整改</span><span class="s-d">无高危漏洞</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>国密算法：</b>SM2/SM3/SM4 加密与签名。</div>
+                <div class="f"><b>传输加密：</b>HTTPS / 国密 TLS。</div>
+                <div class="f"><b>存储加密：</b>敏感数据加密存储。</div>
+                <div class="f"><b>安全基线巡检：</b>定期基线核查。</div>
+                <div class="f"><b>漏洞扫描与整改：</b>无 CVSS≥4.0 漏洞承诺。</div>
+                <div class="f"><b>脱敏与保密管理：</b>数据脱敏、保密制度。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.2 安全保密要求（国密、基线、无高危漏洞）。</div>
+            </div>
+          </div>
+
+          <!-- M15 运维监控 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">15</span><span class="mc-name">运维监控</span><span class="mc-tag">集成与支撑层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>全链路智能运维监控，保障系统稳定运行与及时响应，将故障影响降到最低。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">指标采集</span><span class="s-d">多维度</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">全链路监控</span><span class="s-d">应用/数据/设施</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">智能告警</span><span class="s-d">阈值/异常</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">根因分析</span><span class="s-d">关联定位</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">自动化运维</span><span class="s-d">自愈/扩容</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>全链路监控：</b>应用/服务/数据/基础设施。</div>
+                <div class="f"><b>性能监控：</b>响应、吞吐、资源占用。</div>
+                <div class="f"><b>智能告警：</b>阈值/异常检测告警。</div>
+                <div class="f"><b>根因分析：</b>告警关联与定位。</div>
+                <div class="f"><b>自动化运维：</b>自愈、弹性扩容。</div>
+                <div class="f"><b>健康巡检：</b>定期健康检查报告。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>3.2.2 可靠性与运维要求（稳定性、可维护性）。</div>
+            </div>
+          </div>
+
+          <!-- M16 部署上线 -->
+          <div class="modcard">
+            <div class="mc-head"><span class="mc-no">16</span><span class="mc-name">部署上线</span><span class="mc-tag">集成与支撑层</span></div>
+            <div class="mc-body">
+              <p class="mc-ov"><b>功能定位：</b>规范的部署、测试、上线与验收支撑体系（含文档培训与成果移交），保障交付质量与平滑过渡。</p>
+              <div class="mc-flow">
+                <div class="mc-step"><span class="s-t">部署方案</span><span class="s-d">高可用/容灾</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">环境准备</span><span class="s-d">隔离管理</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">集成测试</span><span class="s-d">功能/性能/安全</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">灰度上线</span><span class="s-d">回滚预案</span></div><span class="mc-arrow">→</span>
+                <div class="mc-step"><span class="s-t">验收支撑</span><span class="s-d">培训/移交</span></div>
+              </div>
+              <div class="mc-feat">
+                <div class="f"><b>部署方案：</b>高可用、容灾部署设计。</div>
+                <div class="f"><b>环境管理：</b>开发/测试/生产环境隔离。</div>
+                <div class="f"><b>测试支撑：</b>功能/性能/兼容/安全测试。</div>
+                <div class="f"><b>上线策略：</b>灰度/分批上线、回滚预案。</div>
+                <div class="f"><b>验收支撑：</b>配合甲方验收、问题闭环。</div>
+                <div class="f"><b>文档培训：</b>部署/运维/移交文档、培训交底。</div>
+              </div>
+              <div class="mc-spec"><b>对应规格书：</b>第 4.0 进度与交付要求（含文档培训、成果移交）。</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3.2.5 性能设计 -->
+      <div class="sec">
+        <h4>3.2.5 性能设计</h4>
+        <p>依据 3.2.2 性能/质量/可靠性要求，构建"基础设施层—数据层—服务层—应用层"四层性能保障体系。</p>
+        <div class="fig">
+          <div class="layers">
+            <div class="layer l1"><div class="lab">应用层</div><div class="items">前端缓存·按需加载·权限分级渲染；看板刷新频率可配置，避免整页阻塞</div></div>
+            <div class="layer l2"><div class="lab">服务层</div><div class="items">微服务拆分·接口限流·异步化·后台任务队列；耗时操作（导入/归档/报表）后台化处理并反馈进度</div></div>
+            <div class="layer l3"><div class="lab">数据层</div><div class="items">索引优化·分库分表·读写分离·批量提交；关键指标预计算，减少实时聚合压力</div></div>
+            <div class="layer l4"><div class="lab">基础设施层</div><div class="items">国产服务器集群·分布式部署·资源隔离；按数据/用户/并发规模弹性扩容</div></div>
+            <div class="layer l5"><div class="lab">监控闭环</div><div class="items">全链路监控·性能采集·异常告警·容量规划·定期压测调优</div></div>
+          </div>
+          <div class="cap">图 3-3 四层性能设计保障体系</div>
+        </div>
+        <table>
+          <thead><tr><th>场景</th><th>性能指标（示例基线）</th><th>保障措施</th></tr></thead>
+          <tbody>
+            <tr><td>常规页面 / 查询 / 筛选</td><td>响应 ≤ 2s（百万级数据）</td><td>索引优化、缓存、分页</td></tr>
+            <tr><td>复杂统计分析</td><td>后台任务反馈进度，不阻塞页面</td><td>异步队列、预计算</td></tr>
+            <tr><td>大批量数据导入</td><td>支持断点重试、异常清单可补录</td><td>批处理、补偿机制</td></tr>
+            <tr><td>报表 / 批量归档生成</td><td>定时/条件/批量触发，状态可查</td><td>任务调度、进度可视</td></tr>
+            <tr><td>系统稳定性</td><td>异常不影响已归档成果与历史数据</td><td>异常自愈、恢复续跑</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3.2.6 进度管理 -->
+      <div class="sec" id="c3-3">
+        <h4>3.2.6 进度管理</h4>
+        <p>采用"里程碑 + 周计划 + 周例会"闭环机制：以 9 个月 8 大里程碑为总控，分解为月度/双周滚动计划，项目经理每周赴现场汇报，使用 Project/敏捷看板跟踪任务、资源与风险（详见第 4 章）。</p>
+        <ul class="clean">
+          <li><b>计划分级：</b>总体计划 → 阶段计划（对应 8 里程碑）→ 双周迭代任务。</li>
+          <li><b>过程跟踪：</b>燃尽图/看板可视化；偏差 &gt;5% 触发预警与纠偏。</li>
+          <li><b>变更控制：</b>甲方主导需求变更，乙方提交影响分析与回退方案，经确认后实施（3.1.1、3.2.2.4）。</li>
+        </ul>
+        <h4>3.2.7 现场管理</h4>
+        <ul class="clean">
+          <li><b>每周现场：</b>项目经理或核心负责人每周赴甲方现场，进行阶段性成果交付、调试与汇报。</li>
+          <li><b>入场合规：</b>遵守电厂工作规程、设备厂技术文件及甲方保密制度；签署保密承诺，离场清退资料、注销账号。</li>
+          <li><b>现场记录：</b>形成工作日志（覆盖 ≥60 人月）、部署记录、联调记录、问题清单，按月底提交甲方。</li>
+          <li><b>沟通机制：</b>周例会 + 阶段评审会 + 紧急响应；建立甲方-乙方联合问题台账，闭环管理。</li>
+        </ul>
+      </div>
+
+      <!-- 3.2.8 风险评估 -->
+      <div class="sec">
+        <h4>3.2.8 项目风险评估</h4>
+        <p>基于项目特点识别 10 项关键风险，按"发生可能性 × 影响程度"评估等级（1=低，5=极高）：</p>
+        <div class="fig">
+          <div class="matrix">
+            <div class="hd">影响＼可能</div><div class="hd">1</div><div class="hd">2</div><div class="hd">3</div><div class="hd">4</div><div class="hd">5</div>
+            <div class="ax">5 极高</div><div class="m-crit">R7</div><div class="m-crit">R2</div><div class="m-crit">R1</div><div class="m-crit">R1</div><div class="m-crit">R1</div>
+            <div class="ax">4 高</div><div class="m-high">R8</div><div class="m-high">R3</div><div class="m-crit">R1</div><div class="m-crit">R1</div><div class="m-crit">R1</div>
+            <div class="ax">3 中</div><div class="m-med">R9</div><div class="m-high">R4</div><div class="m-high">R3</div><div class="m-high">R2</div><div class="m-crit">R1</div>
+            <div class="ax">2 低</div><div class="m-low">R10</div><div class="m-med">R5</div><div class="m-high">R4</div><div class="m-high">R3</div><div class="m-high">R2</div>
+            <div class="ax">1 极低</div><div class="m-low">R10</div><div class="m-low">R6</div><div class="m-med">R5</div><div class="m-med">R4</div><div class="m-high">R3</div>
+          </div>
+          <div class="cap">图 3-4 项目风险矩阵（颜色越深风险越高）</div>
+        </div>
+        <table>
+          <thead><tr><th class="num">编号</th><th>风险项</th><th>可能</th><th>影响</th><th>等级</th><th>主要控制措施</th></tr></thead>
+          <tbody>
+            <tr><td class="num">R1</td><td>国产化适配兼容性风险</td><td>4</td><td>5</td><td style="color:#c8102e;font-weight:700;">极高</td><td>提前搭建适配环境、生态认证、专项兼容性测试</td></tr>
+            <tr><td class="num">R2</td><td>既有基础融合风险</td><td>3</td><td>4</td><td style="color:#e8733b;font-weight:700;">高</td><td>现有基础梳理、融合方案甲方确认后实施</td></tr>
+            <tr><td class="num">R3</td><td>进度风险（9月/80人月紧）</td><td>3</td><td>3</td><td style="color:#e8733b;font-weight:700;">高</td><td>里程碑管控、资源冗余、并行开发</td></tr>
+            <tr><td class="num">R4</td><td>数据质量与可追溯风险</td><td>3</td><td>3</td><td style="color:#e8733b;font-weight:700;">高</td><td>质量规则推荐、全链路留痕、异常清单</td></tr>
+            <tr><td class="num">R5</td><td>安全保密与供应链风险</td><td>2</td><td>3</td><td style="color:#e8a33d;font-weight:700;">中</td><td>SBOM、无 CVSS≥4.0 漏洞、安全测试整改</td></tr>
+            <tr><td class="num">R6</td><td>人员稳定风险</td><td>2</td><td>1</td><td style="color:#2e9e5b;font-weight:700;">低</td><td>核心人员锁定、AB 角、更换审批</td></tr>
+            <tr><td class="num">R7</td><td>现场交付与沟通风险</td><td>5</td><td>5</td><td style="color:#c8102e;font-weight:700;">极高</td><td>每周现场、联合台账、阶段评审</td></tr>
+            <tr><td class="num">R8</td><td>需求变更风险（甲方主导）</td><td>4</td><td>2</td><td style="color:#e8733b;font-weight:700;">高</td><td>变更流程、影响分析、版本留痕</td></tr>
+            <tr><td class="num">R9</td><td>性能与稳定性风险</td><td>3</td><td>3</td><td style="color:#e8a33d;font-weight:700;">中</td><td>后台任务、性能测试、异常自愈</td></tr>
+            <tr><td class="num">R10</td><td>供应链组件合规风险</td><td>1</td><td>2</td><td style="color:#2e9e5b;font-weight:700;">低</td><td>开源清单、许可证审查、SBOM 交付</td></tr>
+          </tbody>
+        </table>
+
+        <h4>3.2.9 风险控制措施</h4>
+        <table>
+          <thead><tr><th class="num">序号</th><th>风险</th><th>具体控制措施</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>国产化适配（R1/R9）</td><td>① 启动即搭建麒麟/UOS+达梦/金仓适配环境；② 优先选用已获生态兼容认证组件；③ 专项兼容性测试覆盖安装/功能/页面/接口/导入导出/报表；④ 性能压测；⑤ 问题整改闭环并出兼容性报告。</td></tr>
+            <tr><td class="num">2</td><td>既有基础融合（R2）</td><td>① 甲方指导下完成现有基础梳理；② 编制融合改造方案明确融合方式/接入/改造/接口/归档/适配/计划/风险；③ 方案经甲方确认后实施。</td></tr>
+            <tr><td class="num">3</td><td>进度（R3）</td><td>① 里程碑+双周滚动；② 关键路径并行、人员冗余；③ 偏差&gt;5%预警纠偏；④ 阶段交付物确认作为进度款前置。</td></tr>
+            <tr><td class="num">4</td><td>数据质量（R4）</td><td>① 智能质量规则推荐与自动校验；② 处理前/后数据、规则、日志全留存；③ 异常数据形成清单标记、可补录、不中断整体；④ 质量报告可查询导出。</td></tr>
+            <tr><td class="num">5</td><td>安全保密/供应链（R5/R10）</td><td>① 交付完整 SBOM，承诺无 CVSS≥4.0 未修复漏洞；② 不设置后门/隐藏账号/未授权外联；③ 国密加密、安全基线巡检；④ 上线前安全测试闭环；⑤ 开源许可证合规审查。</td></tr>
+            <tr><td class="num">6</td><td>人员稳定（R6）</td><td>① 核心人员合同期锁定；② AB 角备份；③ 更换须甲方书面同意；④ 工作日志与考勤工时表经现场负责人签字。</td></tr>
+            <tr><td class="num">7</td><td>现场交付（R7）</td><td>① 项目经理/核心人员每周现场；② 联合问题台账与周例会；③ 阶段性成果演示确认；④ 保密承诺与离场清退。</td></tr>
+            <tr><td class="num">8</td><td>需求变更（R8）</td><td>① 甲方主导变更；② 乙方提交影响分析/回退方案；③ 版本管理与变更留痕；④ 重大升级经甲方确认。</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3.2.10 质量控制 -->
+      <div class="sec">
+        <h4>3.2.10 质量控制措施</h4>
+        <p>建立"PDCA + 多重测试 + 版本门禁"质量控制体系，确保交付成果完整、准确、可读、可部署、可维护、可审计（满足 3.2.2、3.2.5）。</p>
+        <div class="fig">
+          <div class="pdca">
+            <svg viewBox="0 0 200 200" width="190" height="190" aria-label="PDCA质量循环">
+              <circle cx="100" cy="100" r="92" fill="none" stroke="#d8dee8" stroke-width="2"/>
+              <path d="M100,100 L100,8 A92,92 0 0,1 192,100 Z" fill="#1a4d8f" opacity=".92"/>
+              <path d="M100,100 L192,100 A92,92 0 0,1 100,192 Z" fill="#2f6fb0" opacity=".92"/>
+              <path d="M100,100 L100,192 A92,92 0 0,1 8,100 Z" fill="#3f86c4" opacity=".92"/>
+              <path d="M100,100 L8,100 A92,92 0 0,1 100,8 Z" fill="#5aa0d4" opacity=".92"/>
+              <text x="100" y="55" fill="#fff" font-size="17" font-weight="700" text-anchor="middle">P 计划</text>
+              <text x="148" y="108" fill="#fff" font-size="17" font-weight="700" text-anchor="middle">D 执行</text>
+              <text x="100" y="160" fill="#0f2e54" font-size="17" font-weight="700" text-anchor="middle">C 检查</text>
+              <text x="52" y="108" fill="#0f2e54" font-size="17" font-weight="700" text-anchor="middle">A 改进</text>
+              <circle cx="100" cy="100" r="33" fill="#fff"/>
+              <text x="100" y="96" font-size="14" font-weight="800" fill="#143c6b" text-anchor="middle">质量</text>
+              <text x="100" y="113" font-size="12" fill="#c8102e" text-anchor="middle">闭环</text>
+            </svg>
+            <div class="steps">
+              <div class="st"><b>P 计划</b><br>实施方案、测试方案、质量计划，明确准入准出标准。</div>
+              <div class="st"><b>D 执行</b><br>按融合改造方案开发/配置/适配，版本内部自测后部署。</div>
+              <div class="st"><b>C 检查</b><br>功能/接口/数据/性能/安全/国产化/用户验证七类测试，问题闭环。</div>
+              <div class="st"><b>A 改进</b><br>整改复测、回归验证、版本迭代与经验沉淀。</div>
+            </div>
+          </div>
+          <div class="cap">图 3-5 质量控制 PDCA 循环</div>
+        </div>
+        <ul class="clean">
+          <li><b>版本门禁：</b>每次交付明确版本号、更新内容、修复问题、DB/配置/接口变更与回退方式；未经验证版本不得入甲方环境（3.2.2.4）。</li>
+          <li><b>测试覆盖：</b>功能、接口、数据、性能、兼容性、安全、国产化适配、用户验证八类测试；用例覆盖正常/异常/边界/权限/导入导出/归档/日志（3.2.2.5）。</li>
+          <li><b>问题闭环：</b>问题清单含编号、描述、影响、责任人、措施、完成时间、复测结果，闭环后甲方确认关闭。</li>
+        </ul>
+      </div>
+
+      <!-- 3.2.11 文件管理 -->
+      <div class="sec">
+        <h4>3.2.11 文件管理</h4>
+        <p>按规格书第 6.0 章建立完整项目文件管理体系，确保过程可追溯、成果可审计、移交完整。</p>
+        <table>
+          <thead><tr><th>类别</th><th>主要交付文件</th><th>提交节点</th></tr></thead>
+          <tbody>
+            <tr><td>方案类</td><td>项目实施方案、融合改造方案、上线方案、测试方案</td><td>D0+0.5 ~ 5 月</td></tr>
+            <tr><td>配置/接口类</td><td>功能改造说明、接口文档、数据字典、配置文件、部署脚本</td><td>D0+3 ~ 6 月</td></tr>
+            <tr><td>环境/国产化类</td><td>运行环境清单、安装部署手册、国产化适配说明、兼容性测试报告</td><td>D0+2 ~ 5 月</td></tr>
+            <tr><td>测试/验收类</td><td>测试用例集、测试记录与报告、问题整改记录、初/终验申请与报告</td><td>D0+5 ~ 9 月</td></tr>
+            <tr><td>运维/培训类</td><td>用户操作手册、运维管理手册、培训材料与签到、SBOM</td><td>D0+6 月</td></tr>
+            <tr><td>质保/记录类</td><td>质保承诺书、售后及应急支持方案、工作日志（每月）</td><td>D0+6 月 / 每月</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">文件管理原则：所有资料符合国家规范与甲方制度；保证真实性、完整性、可追溯性；未经甲方同意不设置加密/混淆/远程授权等限制（3.3、3.4.7、6.0）。</div>
+      </div>
+
+      <!-- 3.3 重点难点 -->
+      <div class="sec" id="c3-4">
+        <h3>3.3 项目重点难点分析及应对措施</h3>
+        <p>围绕本项目"信息系统服务连续性、信息安全风险防控、服务质量管控"三大重点难点，分别给出重点、难点与应对措施。</p>
+        <table>
+          <thead><tr><th style="width:18%;">主题</th><th>重点分析</th><th>难点分析</th><th>应对措施</th></tr></thead>
+          <tbody>
+            <tr><td><b>信息系统服务连续性保障及突发故障应急处置</b></td>
+              <td>系统在内网生产环境运行，须保障日常连续使用与上线稳定性。</td>
+              <td>任务中断、接口异常、数据/网络/数据库异常时避免整体失败；恢复后不丢失历史数据。</td>
+              <td>关键服务/DB/接口/调度/存储稳定性设计；异常重试/补偿/人工处理；后台任务与异常清单；上线前稳定性测试与试运行整改；应急预案与回退方案。</td></tr>
+            <tr><td><b>信息安全风险防控及数据保密措施</b></td>
+              <td>满足甲方信息安全、网络安全、数据安全与保密管理要求。</td>
+              <td>内网隔离、无外联；敏感数据分级、关键操作审计；无后门/隐藏账号/未授权外联。</td>
+              <td>国密加密、ABAC+RBAC字段级控制、敏感操作审批；全链路审计不可篡改；上线前安全测试闭环；供应链 SBOM、无 CVSS≥4.0 漏洞；保密承诺与离场清退。</td></tr>
+            <tr><td><b>项目服务质量管控及持续改进机制</b></td>
+              <td>成果自主可控、可审计、可维护、可迁移。</td>
+              <td>不将核心能力封装为黑盒；保障甲方验收后独立运维。</td>
+              <td>ISO9001+CMMI 流程、PDCA、八类测试、版本门禁；完整移交源码/脚本/文档；技术交底与知识转移；18个月质保与持续改进。</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3.4 采购范围 -->
+      <div class="sec">
+        <h3>3.4 采购范围说明</h3>
+        <h4>3.4.1 服务范围说明</h4>
+        <p>乙方基于核源平台提供升级改造服务，范围包括插件提供、产品适配改造、功能配置与二次开发、数据接入处理、分析展示优化、归档管理完善、接口联调、国产化适配、系统部署、测试验证、上线支撑、技术培训和售后服务（共 17 项，见规格书第 2.0 章）。</p>
+        <h4>3.4.2 文档供货范围说明</h4>
+        <p>交付完整成果：实施方案、融合改造方案、功能说明、接口文档、数据字典、部署手册、用户手册、运维手册、测试报告、整改记录、培训材料、技术交底材料、配置文件、数据库脚本、部署脚本、安装包与二次开发成果（共 24 类，见 6.0 文件清单）。</p>
+        <h4>3.4.3 培训服务范围说明</h4>
+        <p>提供用户培训（登录、查询、统计、报表、归档、检索、权限、常见问题）与运维培训（部署架构、启停、配置、库维护、接口、调度、日志、备份恢复、故障排查、版本升级）。</p>
+      </div>
+
+      <!-- 3.5 规范法规 -->
+      <div class="sec">
+        <h3>3.5 规范法规说明</h3>
+        <h4>3.5.1 总体要求</h4>
+        <p>所有服务活动遵循国家/行业规范标准；现场活动遵循电厂工作规程及设备制造厂技术文件；编制的专项方案、应急预案、技术文件、检测记录须符合国家相关规范规程；保证文件数据真实性、完整性、可追溯性（3.1、3.4）。</p>
+        <h4>3.5.2 适用的规范/标准说明</h4>
+        <ul class="clean">
+          <li>GB/T 43698-2024《网络安全技术 软件供应链安全要求》</li>
+          <li>T/ISC 0044-2024《软件供应链安全要求实施指南》</li>
+          <li>信息系统安全等级保护相关标准（按甲方要求）</li>
+          <li>国密算法 SM2/SM3/SM4 相关标准</li>
+          <li>国产化软硬件（麒麟/统信UOS、达梦/金仓/openGauss）适配规范</li>
+          <li>甲方内部数据标准、接口规范、保密管理制度</li>
+        </ul>
+      </div>
+
+      <!-- 3.6 甲乙双方职责 -->
+      <div class="sec">
+        <h3>3.6 甲乙双方职责范围说明</h3>
+        <h4>3.6.1 甲方职责</h4>
+        <ul class="clean">
+          <li>主导项目总体架构设计与核心需求决策，确认融合改造方案、核心业务规则、关键数据模型、权限体系、接口原则与安全策略。</li>
+          <li>提供既有业务基础、数据基础、系统基础、接口基础与运行环境，协调内网测试/适配/运行资源。</li>
+          <li>组织阶段评审、验收，确认交付物，按约定支付进度款。</li>
+        </ul>
+        <h4>3.6.2 乙方职责</h4>
+        <ul class="clean">
+          <li>基于成熟产品完成适配、融合、升级、优化，开展二次开发、配置、接口扩展、部署与运行支撑。</li>
+          <li>提交融合改造方案、各类交付文档与源码，保障自主可控、可审计、可维护。</li>
+          <li>每周现场交付与汇报，配合测试、培训、交底，提供 18 个月质保与持续技术支持。</li>
+        </ul>
+      </div>
+
+      <!-- 3.7 资质人员 -->
+      <div class="sec">
+        <h3>3.7 资质和人员要求说明</h3>
+        <p>乙方应具备软件企业/高新等资质（见 1.2）；项目总人月数不少于 80 人月，核心人员含项目经理（本科/8年+）、开发工程师（大专7年+/本科3年+）、资深架构师（本科10年+/硕士5年+）等（见第 2 章）。团队保持稳定，未经甲方同意不得随意更换。</p>
+      </div>
+
+      <!-- 3.8 物质 -->
+      <div class="sec">
+        <h3>3.8 物质要求说明（工器具与备品备件）</h3>
+        <h4>3.8.1 工器具范围说明</h4>
+        <p>本项目"工器具"主要为开发测试工具、部署运行环境与国产化组件（详见 3.2.3 工具要求）：IDE（IDEA/VS Code）、构建（Maven/Git/Jenkins）、测试（JUnit/Postman/JMeter）、国产化 OS/DB/中间件、国密组件。均来源合法、安全正版、许可证合规，不在甲方环境安装无关或穿透类工具。</p>
+        <h4>3.8.2 备品备件/耗材说明</h4>
+        <p>软件服务项目无非一次性耗材；交付的安装介质、离线安装包、补丁包、国产化适配版本等作为成果介质妥善提供，并按甲方要求备份。</p>
+      </div>
+
+      <!-- 3.9 文件要求 -->
+      <div class="sec">
+        <h3>3.9 文件要求说明</h3>
+        <h4>3.9.1 提供文件清单及时间要求</h4>
+        <p>乙方应提交 24 类交付物（见 3.2.11 与 6.0 清单），按 D0+2 月至 D0+9 月时间节点提交；工作日志每月月底提供，覆盖 ≥60 人月。</p>
+        <h4>3.9.2 文件提供的方式说明</h4>
+        <ul class="clean">
+          <li><b>内容详实性承诺：</b>文档完整、准确、可读、可部署、可维护、可审计。</li>
+          <li><b>完整性与纠错机制承诺：</b>发现问题及时修订并重新提交，版本可追溯。</li>
+          <li><b>防护与清单管理承诺：</b>提供交付文件清单与介质，注明版本与日期。</li>
+          <li><b>电子版提交承诺：</b>优先提交电子版（可刻盘/离线介质），符合内网安全要求。</li>
+        </ul>
+      </div>
+
+      <!-- 3.10 质保 -->
+      <div class="sec" id="c3-5">
+        <h3>3.10 质量保证要求说明</h3>
+        <h4>3.10.1 质量保证说明</h4>
+        <ul class="clean">
+          <li><b>体系概述：</b>ISO 9001 + CMMI 流程，覆盖需求、设计、开发、测试、部署、运维全流程。</li>
+          <li><b>覆盖范围：</b>产品质量、实施质量、配置质量、接口适配质量与文档质量。</li>
+          <li><b>组织与职责：</b>项目经理统筹，测试与质量组独立把关，质量安全员监督。</li>
+          <li><b>配合监查：</b>接受甲方质保监查与监督，提供过程记录。</li>
+          <li><b>事件追溯：</b>质量事件可追溯调查，必要时开展体系审核。</li>
+          <li><b>人员责任：</b>人员信息真实、通过背景审查，落实安全管理责任。</li>
+          <li><b>持续改进：</b>阶段性复盘，优化流程与模板。</li>
+        </ul>
+        <h4>3.10.2 质量保证期说明</h4>
+        <p>甲方验收后提供 <span class="note">18 个月</span>质量保证期；因产品/实施/配置/接口/文档缺陷导致的问题，乙方免费整改与技术支持（规格书 12.1）。</p>
+      </div>
+
+      <!-- 3.11 培训 -->
+      <div class="sec">
+        <h3>3.11 培训要求说明</h3>
+        <div class="grid g2">
+          <div class="card"><h4>培训目标</h4><p class="muted" style="margin:0;">使甲方人员掌握系统使用、运维、排查与基础配置调整。</p></div>
+          <div class="card"><h4>培训对象</h4><p class="muted" style="margin:0;">业务用户（使用侧）与运维人员（管理侧）。</p></div>
+          <div class="card"><h4>课程内容</h4><p class="muted" style="margin:0;">功能操作、设计/源程序模块技术、安装配置与运行维护。</p></div>
+          <div class="card"><h4>时间节点</h4><p class="muted" style="margin:0;">上线前与试运行阶段安排，按甲方要求灵活组织。</p></div>
+          <div class="card"><h4>交付物</h4><p class="muted" style="margin:0;">培训材料、签到/记录、答疑纪要。</p></div>
+          <div class="card"><h4>效果评估</h4><p class="muted" style="margin:0;">通过实操考核与反馈问卷评估培训效果。</p></div>
+        </div>
+      </div>
+
+      <!-- 3.12 验收 -->
+      <div class="sec">
+        <h3>3.12 验收要求说明</h3>
+        <ul class="clean">
+          <li><b>验收要求：</b>成果交付型技术服务采购，须严格按技术规格书人力投入计划执行，提交经现场负责人签字的考勤工时表与工作记录作为进度款前置（验收要求）。</li>
+          <li><b>验收前提条件：</b>完成全部工作并提交相应文档，验收材料经双方确认签字。</li>
+          <li><b>验收依据与标准：</b>本技术规格书、经甲方确认的清单、阶段交付物与验收材料。</li>
+          <li><b>验收程序：</b>安装调试完成后，甲方线上/线下会议评审，通过后出具双方签字的验收材料。</li>
+          <li><b>其他约定：</b>最终验收仅以规格书、确认清单、阶段交付物与验收材料为准，不得以"已投入足够人"为由降低标准或提前通过。</li>
+        </ul>
+      </div>
+
+      <!-- 3.13 知识产权保密 -->
+      <div class="sec">
+        <h3>3.13 知识产权、技术成果的保密说明</h3>
+        <ul class="clean">
+          <li>项目实施形成的二次开发成果、配置文件、数据库脚本、接口文档、数据字典、部署/测试/运维/培训资料完整移交甲方。</li>
+          <li>核心能力不封装为不可审计、不可维护、不可迁移的黑盒；不通过私有协议、远程授权、云端许可、加密锁定限制甲方后续使用、维护、扩展与升级（3.3）。</li>
+          <li>乙方及项目人员严格遵守甲方保密制度，未经书面同意不向第三方披露甲方业务、技术、数据、接口、配置与成果；项目结束按甲方要求完成资料清退、账号注销、数据删除与保密确认（3.4.7）。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ 第4章 进度计划 ============ -->
+    <section class="chapter" id="c4">
+      <div class="ch-head"><div class="no">4</div><h2>进度计划</h2></div>
+      <p>项目自合同签订日（D0）起 9 个月内完成，共 8 大里程碑节点，严格对应技术规格书第 4.0 章。</p>
+
+      <div class="sec">
+        <h3>4.1 工期目标</h3>
+        <h4>4.1.1 核心目标</h4>
+        <p>9 个月内完成升级改造、部署上线、试运行与初验，D0+9 月完成整改闭环与最终验收。</p>
+        <h4>4.1.2 关键里程碑</h4>
+        <p>项目启动（D0+0.5）、基础梳理（D0+1）、环境部署与核心配置（D0+2）、主要功能与数据接入（D0+3）、接口/归档/报表/权限联调（D0+4）、部署/国产化/综合测试（D0+5）、上线/试运行/初验（D0+6）、最终验收（D0+9）。</p>
+        <h4>4.1.3 缓冲机制</h4>
+        <p>各阶段预留并行与缓冲；关键路径设资源冗余，偏差&gt;5% 触发预警，里程碑间保留整改窗口。</p>
+      </div>
+
+      <div class="sec">
+        <h3>4.2 施工进度计划（甘特图）</h3>
+        <div class="fig">
+          <div class="gantt">
+            <div class="g-head"><div>阶段 / 里程碑</div><div class="g-months"><div>M1</div><div>M2</div><div>M3</div><div>M4</div><div>M5</div><div>M6</div><div>M7</div><div>M8</div><div>M9</div></div></div>
+            <div class="g-row"><div class="g-name">① 项目启动与准备</div><div class="g-track"><div class="g-bar" style="left:0%;width:5.6%;">D0~0.5</div></div></div>
+            <div class="g-row"><div class="g-name">② 基础梳理与融合准备</div><div class="g-track"><div class="g-bar" style="left:5.6%;width:5.6%;">0.5~1</div></div></div>
+            <div class="g-row"><div class="g-name">③ 环境部署与核心配置</div><div class="g-track"><div class="g-bar" style="left:11.1%;width:11.1%;">1~2</div></div></div>
+            <div class="g-row"><div class="g-name">④ 主要功能升级与数据接入</div><div class="g-track"><div class="g-bar" style="left:22.2%;width:11.1%;">2~3</div></div></div>
+            <div class="g-row"><div class="g-name">⑤ 接口/归档/报表/权限联调</div><div class="g-track"><div class="g-bar" style="left:33.3%;width:11.1%;">3~4</div></div></div>
+            <div class="g-row"><div class="g-name">⑥ 部署/国产化/综合测试/上线准备</div><div class="g-track"><div class="g-bar" style="left:44.4%;width:11.1%;">4~5</div></div></div>
+            <div class="g-row"><div class="g-name">⑦ 上线/试运行/培训交底/初验</div><div class="g-track"><div class="g-bar" style="left:55.6%;width:11.1%;">5~6</div></div></div>
+            <div class="g-row"><div class="g-name">⑧ 试运行整改与最终验收</div><div class="g-track"><div class="g-bar" style="left:66.7%;width:33.3%;">6~9</div></div></div>
+            <div class="g-marks">
+              <div class="g-dot" style="left:5.6%;"><span></span></div><div class="g-dot" style="left:11.1%;"><span></span></div>
+              <div class="g-dot" style="left:22.2%;"><span></span></div><div class="g-dot" style="left:33.3%;"><span></span></div>
+              <div class="g-dot" style="left:44.4%;"><span></span></div><div class="g-dot" style="left:55.6%;"><span></span></div>
+              <div class="g-dot" style="left:66.7%;"><span></span></div><div class="g-dot" style="left:100%;"><span></span></div>
+            </div>
+          </div>
+          <div class="legend"><i style="background:linear-gradient(90deg,#1a4d8f,#2f6fb0);"></i>实施阶段 <i style="background:#c8102e;"></i>里程碑节点（红点）</div>
+          <div class="cap">图 4-1 项目总体进度甘特图（D0 起 9 个月）</div>
+        </div>
+        <h4>里程碑节点与交付物</h4>
+        <table>
+          <thead><tr><th class="num">序号</th><th>里程碑节点</th><th>节点描述</th><th>时间节点</th><th>提交成果</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>项目启动</td><td>启动与实施准备</td><td>D0+0.5月</td><td>实施方案、组织及人员名单、进度计划、质量控制安排、运行环境初步清单</td></tr>
+            <tr><td class="num">2</td><td>基础梳理与融合准备</td><td>现有基础梳理与融合实施准备</td><td>D0+1月</td><td>现有基础梳理记录、功能改造范围说明</td></tr>
+            <tr><td class="num">3</td><td>环境部署与核心配置</td><td>基础环境部署与核心功能配置开发</td><td>D0+2月</td><td>运行环境清单、配置文件初版、核心功能说明、源码阶段版本</td></tr>
+            <tr><td class="num">4</td><td>主要功能与数据接入</td><td>主要功能升级与数据接入处理</td><td>D0+3月</td><td>阶段软件包/源码、数据导入迁移记录、阶段测试与整改记录</td></tr>
+            <tr><td class="num">5</td><td>接口/归档/报表/权限联调</td><td>功能联调</td><td>D0+4月</td><td>接口文档、归档/报表/看板/权限/日志审计配置说明</td></tr>
+            <tr><td class="num">6</td><td>部署/国产化/综合测试</td><td>部署、国产化适配、测试与上线准备</td><td>D0+5月</td><td>部署手册与记录、国产化适配说明与兼容报告、测试方案用例、功能测试报告、上线方案</td></tr>
+            <tr><td class="num">7</td><td>上线/试运行/初验</td><td>上线、试运行、培训交底和初步验收</td><td>D0+6月</td><td>最终软件包/源码/构建说明、最终配置、SBOM、最终接口文档、上线报告、试运行记录、用户/运维手册、初验申请与报告、质保承诺、售后应急方案</td></tr>
+            <tr><td class="num">8</td><td>最终验收</td><td>整改闭环与最终验收</td><td>D0+9月</td><td>试运行问题整改与复测记录、遗留问题关闭说明、最终验收申请与报告</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <h3>4.3 项目实施进度保证措施</h3>
+        <ul class="clean">
+          <li><b>资源保障：</b>10 人专职团队、82 人月投入，核心人员锁定与 AB 角。</li>
+          <li><b>计划管控：</b>里程碑+双周滚动，关键路径并行开发。</li>
+          <li><b>工具支撑：</b>Project/敏捷看板可视化跟踪，自动预警偏差。</li>
+        </ul>
+        <h3>4.4 进度偏差应对措施</h3>
+        <p>偏差&gt;5% 即启动预警：分析根因（资源/需求/技术），采取增派人力、调整工序、加班赶工或申请变更；重大偏差报甲方并调整后续里程碑缓冲。</p>
+        <h3>4.5 进度管理和协调要求</h3>
+        <ul class="clean">
+          <li><b>计划变更控制：</b>甲方主导，乙方提交影响分析与回退方案，经确认后实施并留痕。</li>
+          <li><b>进度节点控制：</b>每里程碑输出交付物并经甲方确认，作为进度款前置。</li>
+          <li><b>进度延期风险控制：</b>识别延期诱因（适配/融合/人员），提前预案与缓冲。</li>
+        </ul>
+        <h3>4.6 专项方案</h3>
+        <p>编制融合改造方案、国产化适配方案、上线方案、应急预案、培训方案等专项方案，经甲方确认后执行。</p>
+      </div>
+
+      <div class="sec">
+        <h3>4.7 应急预案</h3>
+        <h4>4.7.1 突发公共事件应对</h4>
+        <ul class="clean">
+          <li><b>疫情封锁/人员隔离：</b>启动远程协作与 AB 角替补，保障现场交付不断档。</li>
+          <li><b>自然灾害（地震、洪水、断电）：</b>启用备份环境、数据异地备份与恢复预案，保障成果安全。</li>
+          <li><b>系统级突发故障：</b>回退方案+异常自愈，先恢复已归档成果与历史数据，再定位问题。</li>
+        </ul>
+        <h4>4.7.2 24 小时内响应甲方紧急需求机制</h4>
+        <ul class="clean">
+          <li><b>响应渠道：</b>专属热线/即时通讯/工单系统，7×24 受理。</li>
+          <li><b>响应流程：</b>受理→分级（一般/紧急/重大）→派单→处理→复核→闭环。</li>
+          <li><b>现场支援：</b>紧急/重大需求 24 小时内技术骨干到场（经甲方同意）。</li>
+          <li><b>资源保障：</b>预留应急人月与备件/介质，保障快速处置。</li>
+        </ul>
+      </div>
+
+      <div class="sec">
+        <h3>4.8 项目进度管理和协调全流程</h3>
+        <h4>4.8.1 总体流程架构：五阶段闭环模型</h4>
+        <div class="fig">
+          <div class="phases">
+            <div class="phase"><div class="pn">启动</div><div class="pd">立项·团队组建·实施方案确认</div></div>
+            <div class="phase"><div class="pn">规划</div><div class="pd">融合方案·计划·风险·质量策划</div></div>
+            <div class="phase"><div class="pn">执行</div><div class="pd">开发·配置·适配·部署·联调</div></div>
+            <div class="phase"><div class="pn">监控</div><div class="pd">进度/质量/风险跟踪·周例会</div></div>
+            <div class="phase"><div class="pn">收尾</div><div class="pd">试运行·培训·验收·移交</div></div>
+          </div>
+          <div class="cap">图 4-2 进度管理五阶段闭环模型（启动→规划→执行→监控→收尾，循环改进）</div>
+        </div>
+        <h4>4.8.2 核心协调机制操作规范</h4>
+        <ul class="clean">
+          <li><b>计划变更控制流程：</b>申请→影响分析→甲方审批→执行→归档。</li>
+          <li><b>进度节点控制机制：</b>里程碑评审会 + 交付物确认 + 进度款挂钩。</li>
+        </ul>
+        <h4>4.8.3 延期风险响应流程</h4>
+        <p>监测预警 → 根因分析 → 纠偏措施（增员/并行/赶工/变更）→ 甲方沟通 → 复盘。</p>
+        <h4>4.8.4 多团队/跨部门协同机制</h4>
+        <p>建立甲方-乙方联合工作组，按模块/阶段划分责任，周例会同步，联合问题台账闭环。</p>
+        <h4>4.8.5 数字化工具应用建议</h4>
+        <p>建议使用项目管理工具（如 Project/看板）进行计划、任务、工时与风险的可视化协同。</p>
+      </div>
+    </section>
+
+    <!-- ============ 第5章 安全质量保证 ============ -->
+    <section class="chapter" id="c5">
+      <div class="ch-head"><div class="no">5</div><h2>安全质量保证</h2></div>
+
+      <div class="sec">
+        <h3>5.1 安全管理目标</h3>
+        <div class="grid g3">
+          <div class="card"><h4>人员安全目标</h4><p class="muted" style="margin:0;">零违规操作、零泄密，人员通过背景审查与保密培训。</p></div>
+          <div class="card"><h4>设备/工具安全目标</h4><p class="muted" style="margin:0;">工具来源合法正版，不在甲方环境安装无关/穿透类软件。</p></div>
+          <div class="card"><h4>合规管理目标</h4><p class="muted" style="margin:0;">符合国标/行标与甲方保密制度，通过安全保密验收。</p></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>5.2 人员安全隐患分析及预防应对措施</h3>
+        <h4>5.2.1 隐患分析</h4>
+        <ul class="clean">
+          <li><b>操作层面：</b>误操作、越权访问、敏感数据外传风险。</li>
+          <li><b>意识层面：</b>保密意识不足导致泄密或违规外联。</li>
+          <li><b>资质层面：</b>人员背景不清、权限过大。</li>
+        </ul>
+        <h4>5.2.2 预防和应对措施</h4>
+        <h4>① 准入与动态管控</h4>
+        <ul class="clean">
+          <li>建立"五重审核 + 动态台账 + 涉核背景核查"机制。</li>
+          <li>实施人员安全信用评级，评分与权限挂钩。</li>
+          <li>建立人员涉核操作权限动态调整机制（最小权限）。</li>
+        </ul>
+        <h4>② 分层级分场景安全培训</h4>
+        <ul class="clean">
+          <li>新员工三级安全培训（厂规/保密/岗位）。</li>
+          <li>专项技能与应急培训（故障处置/数据安全）。</li>
+          <li>涉核安全保密培训（合规+红线）。</li>
+        </ul>
+        <h4>③ 现场安全监督</h4>
+        <div class="fig">
+          <div class="super">
+            <div class="s">安全员</div><div class="s">班组长</div><div class="s">兼职安全员</div><div class="s">核电安全专员</div><div class="s">涉核数据安全管理员</div>
+          </div>
+          <div class="cap">图 5-1 现场安全"五级监督"模式</div>
+        </div>
+        <ul class="clean">
+          <li>推行"安全员+班组长+兼职安全员+核电安全专员+涉核数据安全管理员"五级监督。</li>
+          <li>设置智能安全监控（操作审计、异常告警）。</li>
+          <li>建立人员涉核操作行为追溯机制（全链路留痕）。</li>
+        </ul>
+      </div>
+
+      <div class="sec">
+        <h3>5.3 设备/工具安全隐患分析及预防应对措施</h3>
+        <h4>5.3.1 隐患分析</h4>
+        <ul class="clean">
+          <li><b>设备本身：</b>自带笔记本/介质携带恶意代码或数据泄露。</li>
+          <li><b>维护层面：</b>工具版本混乱、补丁缺失引入漏洞。</li>
+          <li><b>操作层面：</b>误连外网、私搭远程/穿透工具。</li>
+          <li><b>防护层面：</b>介质未加密、离线包管理不严。</li>
+        </ul>
+        <h4>5.3.2 预防和应对措施</h4>
+        <h4>① 设备全生命周期管控</h4>
+        <ul class="clean">
+          <li><b>进场前：</b>设备/介质安全检查、杀毒、登记，仅携工作必需设备。</li>
+          <li><b>使用中：</b>禁用无关外设，离线包/介质加密管理，禁止私搭远程工具。</li>
+          <li><b>退场后：</b>按甲方要求清退资料、注销账号、销毁/归还介质。</li>
+        </ul>
+        <h4>② 设备应急处置</h4>
+        <p>发现疑似恶意代码/违规外联立即断网隔离、上报甲方、取证排查并整改，纳入审计。</p>
+      </div>
+
+      <div class="sec">
+        <h3>5.4 安全质量管理承诺</h3>
+        <ul class="clean">
+          <li><b>制度与规程执行：</b>严格遵守甲方及国家相关制度规程。</li>
+          <li><b>动态合规管控：</b>随法规/标准更新动态调整安全配置与流程。</li>
+          <li><b>监督与整改配合：</b>接受甲方监督检查，发现问题限时整改闭环。</li>
+          <li><b>不转包、不违法分包承诺书：</b>本项目由我公司自行组织实施，不转包、不违法分包。</li>
+          <li><b>责任与后果承担：</b>因我方原因导致安全/质量问题的，承担相应责任与后果。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ 第6章 偏离表 ============ -->
+    <section class="chapter" id="c6">
+      <div class="ch-head"><div class="no">6</div><h2>商务、规格、技术参数偏离表</h2></div>
+      <div class="sec">
+        <h3>6.1 商务偏离表</h3>
+        <table>
+          <thead><tr><th class="num">序号</th><th>招标文件商务条款</th><th>投标响应</th><th>偏离说明</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>服务周期 9 个月</td><td>承诺 9 个月内完成</td><td>无偏离</td></tr>
+            <tr><td class="num">2</td><td>质保期 18 个月</td><td>承诺验收后 18 个月质保</td><td>无偏离</td></tr>
+            <tr><td class="num">3</td><td>人员投入 ≥80 人月</td><td>投入 82 人月</td><td>无偏离（正偏离）</td></tr>
+            <tr><td class="num">4</td><td>每周现场交付与汇报</td><td>项目经理/核心人员每周现场</td><td>无偏离</td></tr>
+            <tr><td class="num">5</td><td>不转包、不违法分包</td><td>自行实施，出具承诺函</td><td>无偏离</td></tr>
+            <tr><td class="num">6</td><td>自主可控与 SBOM</td><td>完整移交、交付 SBOM</td><td>无偏离</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sec">
+        <h3>6.2 规格、技术参数偏离表</h3>
+        <p>我公司基于成熟"核源平台"与既有基础融合改造，对技术规格书各功能模块技术要求均予响应，主要模块偏离情况如下（总体声明：<span class="note">无负偏离</span>）：</p>
+        <table>
+          <thead><tr><th style="width:24%;">模块</th><th>技术要求要点（3.2.x）</th><th>投标响应</th><th>偏离</th></tr></thead>
+          <tbody>
+            <tr><td><b>数据管理 / 清洗治理</b></td><td>多源异构、知识图谱治理、全程留痕（3.2.1.2/3）</td><td>成熟产品+配置化改造实现</td><td>无偏离</td></tr>
+            <tr><td><b>模型与指标体系</b></td><td>对象/指标/规则/版本管理（3.2.1.4）</td><td>支持配置与版本留痕</td><td>无偏离</td></tr>
+            <tr><td><b>查询分析与可视化</b></td><td>多条件组合、看板、权限分级（3.2.1.5/6）</td><td>可配置看板与权限展示</td><td>无偏离</td></tr>
+            <tr><td><b>效能评估与归档</b></td><td>综合评估、智能归档、语义检索（3.2.1.7/8）</td><td>知识图谱驱动归档</td><td>无偏离</td></tr>
+            <tr><td><b>审计 / 报表 / 接口</b></td><td>全链路留痕、AI报表、标准化集成（3.2.1.9-11）</td><td>区块链级审计+图形化集成</td><td>无偏离</td></tr>
+            <tr><td><b>权限 / 系统管理</b></td><td>ABAC+RBAC、参数化调度（3.2.1.12/13）</td><td>混合模型+异常自愈</td><td>无偏离</td></tr>
+            <tr><td><b>国产化适配</b></td><td>麒麟/UOS+达梦/金仓/openGauss（3.2.1.14）</td><td>已完成生态兼容互认证</td><td>无偏离</td></tr>
+            <tr><td><b>安全保密 / 运维</b></td><td>国密、基线巡检、全链路监控（3.2.1.15/16）</td><td>国密加密+智能告警</td><td>无偏离</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">偏离表为格式示例；正式投标时按招标文件给定的偏离表模板逐项填写并盖章。</div>
+      </div>
+    </section>
+
+    <!-- ============ 第7章 其他 ============ -->
+    <section class="chapter" id="c7">
+      <div class="ch-head"><div class="no">7</div><h2>其他</h2></div>
+      <div class="sec">
+        <h3>7.1 附件：供应商/承包商应知应会</h3>
+        <p>我公司承诺在项目实施前组织全员学习甲方《供应商/承包商应知应会》，内容包括进场管理、保密红线、作业安全、应急处置与违规处罚，确保全员知晓并签署确认。</p>
+        <h3>7.2 附录1：《廉洁合规告知书》</h3>
+        <p>我公司自愿签署《廉洁合规告知书》，承诺在投标及履约过程中遵守廉洁从业规定，不向甲方人员输送利益，不以不正当手段谋取中标或利益，违者承担相应责任。</p>
+        <h3>7.3 附录2：《网络和数据安全承诺书》</h3>
+        <p>我公司出具《网络和数据安全承诺书》，承诺：系统在内网独立运行、不强制外联；不设置后门/隐藏账号/未授权远程；交付完整 SBOM、无 CVSS≥4.0 未修复漏洞；保护甲方数据不复制、留存、外传或用于本项目以外目的；项目结束按甲方要求归还/删除/销毁相关数据资料。</p>
+      </div>
+
+      <div class="foot">
+        【投标单位全称】　·　生产运行数据分析与归档管理软件升级改造服务投标文件（技术部分·细化版）<br>
+        本文件所有【】标记处请替换为我公司真实信息；配套资质证书、业绩证明、人员证件、承诺函等作为投标附件一并提交。
+      </div>
+    </section>
+
+  </div>
+</div>
+
+</body>
+</html>

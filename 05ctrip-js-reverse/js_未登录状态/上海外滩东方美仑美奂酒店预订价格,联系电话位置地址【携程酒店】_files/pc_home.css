@@ -1,0 +1,60 @@
+@font-face {
+  font-family: "pc_home";
+  src: url(//pic.c-ctrip.com/picaresonline/nfes/pc-home/icon/pc_home.8b1ad44b.eot); /* IE9*/
+  src: url(//pic.c-ctrip.com/picaresonline/nfes/pc-home/icon/pc_home.8b1ad44b.eot) format('embedded-opentype'), /* IE6-IE8 */
+  url(//pic.c-ctrip.com/picaresonline/nfes/pc-home/icon/pc_home.181ecfa4.woff2) format("woff2"),
+  url(//pic.c-ctrip.com/picaresonline/nfes/pc-home/icon/pc_home.9f25c6dd.woff) format("woff"),
+  url(//pic.c-ctrip.com/picaresonline/nfes/pc-home/icon/pc_home.04dbdb6c.ttf) format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url(//pic.c-ctrip.com/picaresonline/nfes/pc-home/icon/pc_home.0de4e6db.svg) format('svg'); /* iOS 4.1- */
+}
+
+[class^="pc_home-"], [class*=" pc_home-"] {
+  font-family: 'pc_home' !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.pc_home-Close:before { content: "\e940"; }
+.pc_home-WarnShape:before { content: "\ef39"; }
+.pc_home-tabbtnIcon:before { content: "\f0a6b"; }
+.pc_home-search:before { content: "\f0a6c"; }
+.pc_home-forward:before { content: "\f0a6d"; }
+.pc_home-account:before { content: "\f0a6e"; }
+.pc_home-yongche:before { content: "\f0a6f"; }
+.pc_home-xiechengjinrong:before { content: "\f0a70"; }
+.pc_home-xiaoxitongzhi:before { content: "\f0a71"; }
+.pc_home-wuzhangai:before { content: "\f0a72"; }
+.pc_home-collect:before { content: "\f0a73"; }
+.pc_home-wallet:before { content: "\f0a74"; }
+.pc_home-points:before { content: "\f0a75"; }
+.pc_home-logout:before { content: "\f0a76"; }
+.pc_home-phone:before { content: "\f0a77"; }
+.pc_home-quanbudingdan:before { content: "\f0a78"; }
+.pc_home-qichechuanpiao:before { content: "\f0a79"; }
+.pc_home-menpiaohuodong:before { content: "\f0a7b"; }
+.pc_home-lvyou:before { content: "\f0a7c"; }
+.pc_home-lipinka:before { content: "\f0a7d"; }
+.pc_home-customerService:before { content: "\f0a7e"; }
+.pc_home-jiudian:before { content: "\f0a7f"; }
+.pc_home-jipiao:before { content: "\f0a80"; }
+.pc_home-huochepiao:before { content: "\f0a81"; }
+.pc_home-vipMall:before { content: "\f0a82"; }
+.pc_home-cooperationCard:before { content: "\f0a83"; }
+.pc_home-gongluejingdian:before { content: "\f0a84"; }
+.pc_home-dingdan:before { content: "\f0a85"; }
+.pc_home-chujing:before { content: "\f0a86"; }
+.pc_home-commonInfo:before { content: "\f0a87"; }
+.pc_home-dropup:before { content: "\f0a89"; }
+.pc_home-dropdown:before { content: "\f0a8a"; }
+.pc_home-shanlv:before { content: "\f0a88"; }
+.pc_home-back:before { content: "\f0ab2"; }
+.pc_home-home:before { content: "\f0ab4"; }
+.pc_home-mudidi:before { content: "\f0a7a"; }
+.pc_home-jinglao:before { content: "\f10c3"; }
+.pc_home-laoyouhui:before { content: "\f1775"; }
+.pc_home-about:before { content: "\f186b"; }
+.pc_home-travelmap:before { content: "\f1e36"; }
+.pc_home-RoutePlanning:before { content: "\f2354"; }
