@@ -1,0 +1,8 @@
+pywinauto>=0.6.8
+pywin32>=306
+pyautogui>=0.9.54
+mss>=9.0.1
+Pillow>=10.0.0
+opencv-python>=4.8.0
+paddleocr>=2.8.0
+paddlepaddle>=2.6.0

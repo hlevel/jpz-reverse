@@ -1,0 +1,27 @@
+{
+  "wechat_window_title": "微信",
+  "mini_program_name": "示例小程序",
+  "startup_wait_seconds": 2,
+  "default_timeout_seconds": 15,
+  "screenshots_dir": "artifacts/screenshots",
+  "actions": [
+    {
+      "type": "wait_for_text",
+      "text": "首页",
+      "timeout_seconds": 15
+    },
+    {
+      "type": "click_text",
+      "text": "签到",
+      "timeout_seconds": 10
+    },
+    {
+      "type": "wait",
+      "seconds": 2
+    },
+    {
+      "type": "screenshot",
+      "name": "after-check-in"
+    }
+  ]
+}
