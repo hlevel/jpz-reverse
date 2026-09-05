@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+
+# Local configuration may contain device/account identifiers.
+configs/config.yaml
+config/config.yaml
